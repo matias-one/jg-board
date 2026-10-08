@@ -1,0 +1,9 @@
+{
+  "title": "Mirror Charger Concepts",
+  "images": [
+    { "fileName": "1.png", "title": "Studio Light",
+      "description": "Matte shell, soft top light. Feels closest to the brand." },
+    { "fileName": "2.png", "title": "Soft Minimal",
+      "description": "Reduced detail, more negative space around the port." }
+  ]
+}
