@@ -7,15 +7,13 @@
 <style>
   :root{
     --bg:#FAF9F7; --surface:#FFFFFF; --ink:#0E0E0E; --muted:#8A8A88;
-    --line:#EAE8E3; --line-strong:#D6D2CC; --accent:#111111;
-    --safe-top: env(safe-area-inset-top, 0px);
+    --line:#EAE8E3; --line-strong:#D6D2CC; --safe-top: env(safe-area-inset-top, 0px);
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
     font-family:system-ui,-apple-system,BlinkMacSystemFont,"Inter",sans-serif;
     -webkit-font-smoothing:antialiased}
-  button{font-family:inherit}
-  textarea{font-family:inherit}
+  button,input,textarea{font-family:inherit}
   .app-root{min-height:100vh;padding-top:var(--safe-top)}
   .shell{max-width:1280px;margin:0 auto;padding:0 24px}
   @media(min-width:1024px){.shell{padding:0 40px}}
@@ -34,16 +32,6 @@
     background:#111;animation:pulse 2s infinite}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-  .uploader{margin:24px 0 28px;border:1px dashed var(--line-strong);background:var(--surface);
-    border-radius:16px;padding:28px;transition:all .2s;position:relative}
-  .uploader.drag{border-color:var(--ink);background:#FFFEFD;transform:scale(1.01)}
-  .uploader-grid{display:grid;gap:18px}
-  @media(min-width:800px){.uploader-grid{grid-template-columns:1.2fr .8fr;align-items:center}}
-  .drop-copy h2{font-family:Georgia,serif;font-weight:400;font-size:28px;line-height:.95;
-    letter-spacing:-.02em;margin:0 0 10px}
-  .drop-copy p{margin:0;color:var(--muted);font-size:13px;line-height:1.5;max-width:42ch}
-  .upload-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
-
   .btn{appearance:none;border:1px solid var(--ink);background:var(--ink);color:#fff;
     border-radius:999px;padding:12px 18px;font-size:12px;letter-spacing:.12em;
     text-transform:uppercase;font-weight:500;cursor:pointer;transition:all .2s;
@@ -54,14 +42,26 @@
   .btn.ghost:hover{background:#fff;border-color:var(--ink)}
   .btn.small{padding:8px 14px;font-size:10px}
 
+  .uploader{margin:24px 0 28px;border:1px dashed var(--line-strong);background:var(--surface);
+    border-radius:16px;padding:28px;transition:all .2s}
+  .uploader.drag{border-color:var(--ink);background:#FFFEFD;transform:scale(1.01)}
+  .uploader-grid{display:grid;gap:18px}
+  @media(min-width:800px){.uploader-grid{grid-template-columns:1.2fr .8fr;align-items:center}}
+  .drop-copy h2{font-family:Georgia,serif;font-weight:400;font-size:28px;line-height:.95;
+    letter-spacing:-.02em;margin:0 0 10px}
+  .drop-copy p{margin:0;color:var(--muted);font-size:13px;line-height:1.5;max-width:42ch}
+  .upload-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+
   .meta-row{display:flex;gap:16px;flex-wrap:wrap;margin-top:18px;padding-top:18px;
     border-top:1px solid var(--line);font-size:11px;color:var(--muted);letter-spacing:.08em}
   .field{display:flex;flex-direction:column;gap:8px}
   .field label{font-size:10px;letter-spacing:.16em;text-transform:uppercase;
     color:var(--muted);font-weight:500}
-  .field input{border:1px solid var(--line-strong);background:var(--surface);
-    border-radius:10px;padding:12px 14px;font-size:13px;outline:none;transition:border .2s;width:100%}
-  .field input:focus{border-color:var(--ink)}
+  .field input,.field textarea{border:1px solid var(--line-strong);background:var(--surface);
+    border-radius:10px;padding:12px 14px;font-size:13px;outline:none;transition:border .2s;
+    width:100%;color:var(--ink)}
+  .field textarea{resize:vertical;line-height:1.55;min-height:72px}
+  .field input:focus,.field textarea:focus{border-color:var(--ink)}
 
   .viewer-wrap{position:relative;margin-top:8px}
   .viewer{position:relative;background:var(--surface);border:1px solid var(--line);
@@ -81,8 +81,8 @@
   .nav-btn:disabled{opacity:.3;pointer-events:none}
   .nav-btn.left{left:14px} .nav-btn.right{right:14px}
 
-  .caption-bar{display:flex;align-items:flex-start;justify-content:space-between;
-    gap:16px;margin-top:18px}
+  .caption-bar{margin-top:18px;display:flex;justify-content:space-between;
+    align-items:flex-start;gap:16px}
   .caption-title{font-family:Georgia,serif;font-size:24px;line-height:1.15;
     letter-spacing:-.015em;max-width:34ch}
   .caption-desc{margin-top:8px;font-size:14px;line-height:1.6;color:#3A3A38;
@@ -90,32 +90,51 @@
   .caption-meta{font-size:11px;color:var(--muted);letter-spacing:.12em;
     text-transform:uppercase;margin-top:12px}
 
-  .feedback{margin-top:22px;border:1px solid var(--line);border-radius:14px;
-    background:var(--surface);padding:16px}
-  .feedback label{display:block;font-size:10px;letter-spacing:.16em;text-transform:uppercase;
-    color:var(--muted);font-weight:500;margin-bottom:10px}
-  .feedback textarea{width:100%;min-height:88px;resize:vertical;border:1px solid var(--line-strong);
-    border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.5;outline:none;
-    transition:border .2s;background:var(--surface);color:var(--ink)}
-  .feedback textarea:focus{border-color:var(--ink)}
-  .feedback-actions{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}
-  .fb-status{font-size:11px;color:var(--muted);letter-spacing:.06em}
-  .fb-status.ok{color:#111}
-  .fb-status.err{color:#B42318}
-
   .dots{margin-top:18px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .dot{height:2px;width:24px;background:var(--line-strong);border-radius:999px;
     transition:all .35s cubic-bezier(.16,1,.3,1);cursor:pointer;border:none;padding:0}
   .dot.active{background:var(--ink);width:40px}
 
-  .thumbs{margin-top:24px;border-top:1px solid var(--line);padding-top:20px}
+  /* Comments */
+  .comments{margin-top:32px;border-top:1px solid var(--line);padding-top:24px}
+  .comments-head{display:flex;justify-content:space-between;align-items:baseline;
+    margin-bottom:16px;gap:12px;flex-wrap:wrap}
+  .comments-head h3{margin:0;font-family:Georgia,serif;font-weight:400;font-size:20px;
+    letter-spacing:-.01em}
+  .comments-head span{font-size:10px;color:var(--muted);letter-spacing:.16em;
+    text-transform:uppercase}
+  .comment-list{display:flex;flex-direction:column;gap:14px;margin-bottom:20px}
+  .comment{border:1px solid var(--line);background:var(--surface);border-radius:12px;
+    padding:14px 16px}
+  .comment-head{display:flex;justify-content:space-between;align-items:baseline;
+    gap:12px;margin-bottom:6px}
+  .comment-author{font-weight:600;font-size:13px}
+  .comment-time{font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+  .comment-body{font-size:13px;line-height:1.55;color:#3A3A38;white-space:pre-wrap}
+  .comment-empty{font-size:12px;color:var(--muted);font-style:italic;
+    padding:14px 0 18px}
+  .comment-form{display:flex;flex-direction:column;gap:10px;border:1px solid var(--line);
+    background:var(--surface);border-radius:12px;padding:16px}
+  .comment-form input,.comment-form textarea{border:1px solid var(--line-strong);
+    border-radius:10px;padding:10px 14px;font-size:13px;outline:none;
+    transition:border .2s;background:var(--surface);color:var(--ink);width:100%}
+  .comment-form textarea{min-height:76px;resize:vertical;line-height:1.5}
+  .comment-form input:focus,.comment-form textarea:focus{border-color:var(--ink)}
+  .comment-form .row{display:flex;justify-content:space-between;align-items:center;
+    gap:12px;flex-wrap:wrap}
+  .comment-status{font-size:11px;color:var(--muted);letter-spacing:.06em}
+  .comment-status.err{color:#B42318}
+  .comment-status.ok{color:#111}
+
+  /* Thumbs (edit only) */
+  .thumbs{margin-top:32px;border-top:1px solid var(--line);padding-top:20px}
   .thumbs-head{display:flex;justify-content:space-between;align-items:center;
     margin-bottom:14px;gap:12px;flex-wrap:wrap}
   .thumbs-head h3{margin:0;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
     color:var(--muted);font-weight:500}
   .thumb-strip{display:flex;gap:12px;overflow-x:auto;padding-bottom:12px;scrollbar-width:none}
   .thumb-strip::-webkit-scrollbar{display:none}
-  .thumb{flex:0 0 220px;border:1px solid var(--line);border-radius:12px;overflow:hidden;
+  .thumb{flex:0 0 200px;border:1px solid var(--line);border-radius:12px;overflow:hidden;
     background:var(--surface);position:relative;transition:transform .2s,border-color .2s}
   .thumb.dragging{opacity:.5;transform:scale(.96) rotate(1deg)}
   .thumb.active{border-color:var(--ink)}
@@ -123,12 +142,11 @@
   .thumb-img img{width:100%;height:100%;object-fit:cover;display:block}
   .thumb-index{position:absolute;top:6px;left:6px;background:rgba(255,255,255,.9);
     border-radius:999px;padding:2px 6px;font-size:9px;letter-spacing:.12em}
-  .thumb-body{padding:10px 10px 8px}
+  .thumb-body{padding:10px}
   .thumb-body input,.thumb-body textarea{width:100%;border:none;background:transparent;
     font-size:12px;outline:none;color:var(--ink);border-bottom:1px solid transparent;
     padding:2px 0;display:block}
-  .thumb-body input{font-weight:500}
-  .thumb-body textarea{min-height:44px;resize:vertical;color:var(--muted);
+  .thumb-body textarea{min-height:38px;resize:vertical;color:var(--muted);
     font-size:11px;line-height:1.45;margin-top:4px}
   .thumb-body input:focus,.thumb-body textarea:focus{border-bottom-color:var(--line-strong)}
   .thumb-actions{display:flex;gap:6px;margin-top:8px;align-items:center}
@@ -138,27 +156,20 @@
   .icon-btn:hover{border-color:var(--ink)}
   .icon-btn:disabled{opacity:.3;cursor:default}
 
-  .export-grid{display:grid;gap:12px;margin-top:14px}
-  @media(min-width:700px){.export-grid{grid-template-columns:1fr 1fr}}
-  .export-card{border:1px solid var(--line);border-radius:14px;padding:18px;background:var(--surface)}
-  .export-card h4{margin:0 0 8px;font-size:13px;letter-spacing:.04em;font-weight:600}
-  .export-card p{margin:0 0 14px;font-size:12px;line-height:1.5;color:var(--muted)}
-  code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92em}
-
-  .notice{background:#111;color:#fff;border-radius:12px;padding:14px 16px;font-size:11px;
-    line-height:1.5;letter-spacing:.04em;display:flex;gap:10px}
-  .notice b{font-weight:600}
+  .empty-state{text-align:center;padding:40px}
+  .empty-state .big{font-family:Georgia,serif;font-size:26px;margin-bottom:8px}
+  .empty-state .sub{color:var(--muted);font-size:12px;letter-spacing:.12em;
+    text-transform:uppercase}
 
   .modal-backdrop{position:fixed;inset:0;background:rgba(14,14,14,.38);
     backdrop-filter:blur(8px);z-index:60;display:grid;place-items:center;padding:20px}
   .modal-backdrop[hidden]{display:none}
   .modal{background:var(--surface);border-radius:20px;border:1px solid var(--line);
-    max-width:520px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.12);
-    max-height:86vh;overflow:auto}
-  .modal h3{margin:0 0 10px;font-family:Georgia,serif;font-weight:400;font-size:22px}
-  .modal p,.modal li{font-size:13px;line-height:1.6;color:#444}
-  .modal ul{padding-left:18px;line-height:1.7}
-  .modal-actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+    max-width:440px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.12)}
+  .modal h3{margin:0 0 6px;font-family:Georgia,serif;font-weight:400;font-size:22px}
+  .modal p{font-size:13px;line-height:1.6;color:#444;margin:8px 0 16px}
+  .modal .field{margin-bottom:14px}
+  .modal-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
 
   .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);
     background:#111;color:#fff;padding:10px 18px;border-radius:999px;font-size:12px;
@@ -173,69 +184,41 @@
     <div class="shell" style="display:flex;align-items:center;justify-content:space-between;width:100%">
       <div class="brand">
         <span id="brandTitle">CONCEPT</span>
-        <small id="brandMode">private view</small>
+        <small id="brandMode">review</small>
       </div>
-      <div style="display:flex;align-items:center;gap:10px">
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
         <div class="pill live" id="countPill">0 concepts</div>
-        <button class="btn small ghost" id="modeToggle">Open editor ?edit=1</button>
+        <button class="btn small ghost" id="authBtn">Sign in</button>
       </div>
     </div>
   </div>
 
   <div class="shell" style="padding-top:24px;padding-bottom:64px">
 
-    <!-- EDIT MODE -->
+    <!-- EDIT (only when signed in) -->
     <div id="editBlock" hidden>
       <div class="uploader" id="uploader">
         <div class="uploader-grid">
           <div class="drop-copy">
-            <h2>Upload concepts<br>from your desktop</h2>
-            <p>Drag &amp; drop JPG, PNG, WebP. Add a title and a description to each one.
-               Export a self-contained HTML to push to Pages.</p>
+            <h2>Add a concept<br>to the review</h2>
+            <p>Drop an image here. It uploads straight to the review — no download, no
+               commit. Clients see it the moment it lands.</p>
             <div class="upload-actions">
-              <button class="btn" id="uploadBtn"><span>↑</span> Upload concepts</button>
-              <button class="btn ghost" id="clearBtn">Clear all</button>
+              <button class="btn" id="uploadBtn"><span>↑</span> Choose image</button>
               <input id="fileInput" type="file" multiple accept="image/*" hidden>
             </div>
             <div class="meta-row">
-              <span id="metaFiles">0 files</span>
-              <span>Drag to reorder below • Click to rename</span>
-              <span style="color:#111" id="metaWarn">In-memory preview — export to keep</span>
+              <span id="metaFiles">0 concepts</span>
+              <span>Edit title &amp; description below the viewer</span>
             </div>
           </div>
           <div>
             <div class="field">
-              <label for="titleInput">Presentation title</label>
-              <input id="titleInput" value="CONCEPT STUDY — VOL. 01" placeholder="CONCEPT STUDY — VOL. 01">
-            </div>
-            <div class="export-grid">
-              <div class="export-card">
-                <h4>1 — Download viewer</h4>
-                <p>Single HTML file with all images and descriptions embedded. Upload just
-                   this file to GitHub to update your Pages link.</p>
-                <button class="btn small" id="dlHtml" disabled>Download HTML</button>
-              </div>
-              <div class="export-card">
-                <h4>2 — Download ZIP</h4>
-                <p>Creates <code>index.html</code> + <code>/images</code> +
-                   <code>manifest.json</code>. <span id="zipStatus">Loading JSZip…</span></p>
-                <button class="btn small ghost" id="dlZip" disabled>Download ZIP</button>
-              </div>
+              <label for="studyTitle">Study title</label>
+              <input id="studyTitle" placeholder="Mirror Charger Concepts">
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="notice">
-        <span>◍</span>
-        <div><b>How to update GitHub Pages:</b> Upload → write descriptions → Download HTML
-        (or ZIP) → in your repo, drag the file into the root, commit → Pages link now shows
-        the new concepts. No need to touch <code>/images</code> manually.</div>
-      </div>
-
-      <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
-        <button class="btn ghost small" id="instrBtn">Export instructions</button>
-        <button class="btn ghost small" id="copyBtn" disabled>Copy temporary preview link</button>
       </div>
     </div>
 
@@ -251,71 +234,70 @@
         <div class="caption-meta" id="captionMeta"></div>
       </div>
       <div style="display:flex;gap:8px">
-        <button class="btn small ghost" id="deleteBtn" hidden>Delete</button>
+        <button class="btn small ghost" id="deleteBtn" hidden>Delete concept</button>
       </div>
     </div>
 
-    <!-- FEEDBACK -->
-    <div class="feedback" id="feedbackBlock" hidden>
-      <label for="fbText">Leave feedback on this concept</label>
-      <textarea id="fbText" placeholder="What works, what doesn't, what you'd change…"></textarea>
-      <div class="feedback-actions">
-        <button class="btn small" id="fbSend">Send feedback</button>
-        <button class="btn small ghost" id="fbCopy">Copy</button>
-        <span class="fb-status" id="fbStatus"></span>
+    <!-- Description editor (edit mode only) -->
+    <div id="descEditor" hidden style="margin-top:16px">
+      <div class="field">
+        <label for="descInput">Description for this concept</label>
+        <textarea id="descInput" rows="3" spellcheck="true"
+          placeholder="What works, what to notice, what you're asking for feedback on…"></textarea>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:10px;align-items:center">
+        <button class="btn small" id="descSave">Save description</button>
+        <span class="comment-status" id="descStatus"></span>
       </div>
     </div>
 
     <div class="dots" id="dots" hidden></div>
 
-    <!-- THUMBS (edit only) -->
+    <!-- COMMENTS -->
+    <div class="comments" id="commentsBlock" hidden>
+      <div class="comments-head">
+        <h3>Feedback on this concept</h3>
+        <span id="commentCount"></span>
+      </div>
+      <div class="comment-list" id="commentList"></div>
+      <form class="comment-form" id="commentForm">
+        <input id="commentName" placeholder="Your name (optional)" maxlength="60">
+        <textarea id="commentBody" placeholder="What works, what doesn't, what you'd change…"
+                  maxlength="2000" required></textarea>
+        <div class="row">
+          <button class="btn small" type="submit" id="commentSubmit">Post comment</button>
+          <span class="comment-status" id="commentStatus"></span>
+        </div>
+      </form>
+    </div>
+
+    <!-- THUMBS (edit mode only) -->
     <div class="thumbs" id="thumbs" hidden>
       <div class="thumbs-head">
-        <h3 id="thumbsHead">Sequence</h3>
+        <h3 id="thumbsHead">Order</h3>
         <span style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">
-          Drag or use ← → to reorder • not saved on refresh
+          Drag or use ← → to reorder • changes save instantly
         </span>
       </div>
       <div class="thumb-strip" id="thumbStrip"></div>
     </div>
 
-    <!-- CLIENT FOOTER -->
-    <div id="clientFooter" hidden
-         style="margin-top:32px;border-top:1px solid var(--line);padding-top:20px;
-                display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px">
-      <div style="font-size:11px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase">
-        Private review • arrow keys • swipe • tap dots
-      </div>
-      <a href="?edit=1" style="font-size:11px;color:var(--ink);text-decoration:none;
-         border-bottom:1px solid var(--line-strong);padding-bottom:2px;
-         letter-spacing:.12em;text-transform:uppercase">Owner edit mode</a>
-    </div>
   </div>
 
-  <!-- Instructions modal -->
-  <div class="modal-backdrop" id="instrModal" hidden>
+  <!-- Sign in modal -->
+  <div class="modal-backdrop" id="signinModal" hidden>
     <div class="modal">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <h3 style="margin:0">Export to GitHub Pages</h3>
-        <button class="icon-btn" data-close="instrModal">✕</button>
-      </div>
-      <p><b>Option A — Fastest:</b> Click <b>Download HTML</b>. Every image and description
-         is embedded so the file is 100% standalone. Repo → Add file → Upload files → drop it
-         → Commit. Your Pages URL now shows the new version.</p>
-      <p><b>Option B — Structured:</b> Click <b>Download ZIP</b>. Unzip, then upload
-         <code>index.html</code>, <code>manifest.json</code> and the <code>/images</code>
-         folder to the repo.</p>
-      <div style="background:#FAF9F7;border:1px solid var(--line);border-radius:10px;
-                  padding:12px;margin-top:12px;font-size:12px">
-        <div style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;
-                    color:var(--muted);margin-bottom:6px">Feedback</div>
-        Client feedback is sent from the page itself. Set <code>CONFIG.web3formsKey</code>
-        or <code>CONFIG.feedbackEmail</code> at the top of the script to choose where it goes.
+      <h3>Sign in</h3>
+      <p>Enter your email and I'll send you a magic link.</p>
+      <div class="field">
+        <label for="signinEmail">Email</label>
+        <input id="signinEmail" type="email" placeholder="you@example.com" autocomplete="email">
       </div>
       <div class="modal-actions">
-        <button class="btn" id="instrDlHtml">Download HTML</button>
-        <button class="btn ghost" id="instrDlZip">Download ZIP</button>
+        <button class="btn small" id="signinSend">Send magic link</button>
+        <button class="btn small ghost" data-close="signinModal">Cancel</button>
       </div>
+      <div style="margin-top:12px;font-size:11px;color:var(--muted)" id="signinStatus"></div>
     </div>
   </div>
 
@@ -324,49 +306,40 @@
 <div class="toast" id="toast"></div>
 
 <script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
 /* ==================================================================
- *  CONFIG — set these before sharing the link with anyone
+ *  CONFIG — paste your Supabase project URL and anon key
  * ================================================================== */
-
 const CONFIG = {
-  /* Where client feedback goes.
-   *
-   * Option 1 (recommended): Web3Forms — free, no account needed.
-   *   Go to https://web3forms.com, enter the email you want feedback
-   *   sent to, and they email you an access key. Paste it below.
-   */
-  web3formsKey: '',
-
-  /* Option 2: mailto — opens the client's mail app with the note
-   * prefilled. Used automatically when web3formsKey is empty.
-   */
-  feedbackEmail: '',
-
-  /* If both are empty, the Send button copies the feedback to the
-   * clipboard so the client can paste it wherever they like.
-   */
+  supabaseUrl: '',
+  supabaseAnonKey: '',
+  studyTitle: 'Mirror Charger Concepts',
+  maxImageDimension: 2000,   // images are resized to this before upload
+  jpegQuality: 0.88,
 };
-
 /* ================================================================== */
+
+const sb = createClient(CONFIG.supabaseUrl, CONFIG.supabaseAnonKey, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
+});
 
 const $ = (s, r = document) => r.querySelector(s);
 
 const state = {
-  items: [],            // { id, src, title, description, fileName, size }
+  items: [],
   cur: 0,
-  title: 'CONCEPT STUDY — VOL. 01',
+  title: CONFIG.studyTitle,
   edit: false,
-  loadedFromDisk: false,
+  user: null,
   dragId: null,
-  feedback: {},         // { [itemId]: "draft text" }
+  comments: {},           // { [conceptId]: [...] }
+  loadingComments: false,
 };
 
 const uid = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
 const esc = (s) => String(s).replace(/[&<>"']/g, c =>
   ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
-const encPath = (p) => String(p).split('/').map(encodeURIComponent).join('/');
-const baseName = (f) => String(f).replace(/\.[^/.]+$/, '').replace(/[-_]+/g, ' ');
-const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'concepts';
 
 let toastTimer;
 function toast(msg) {
@@ -374,67 +347,257 @@ function toast(msg) {
   t.textContent = msg;
   t.classList.add('show');
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
 }
 
-/* ---------- manifest ---------- */
-function pickList(raw) {
-  if (Array.isArray(raw)) return raw;
-  if (raw && Array.isArray(raw.images)) return raw.images;
-  if (raw && Array.isArray(raw.concepts)) return raw.concepts;
-  return [];
+function timeAgo(iso) {
+  const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s / 60) + 'm ago';
+  if (s < 86400) return Math.floor(s / 3600) + 'h ago';
+  if (s < 604800) return Math.floor(s / 86400) + 'd ago';
+  return new Date(iso).toLocaleDateString();
 }
 
-function toItem(entry, i) {
-  if (typeof entry === 'string') {
-    return {
-      id: `disk-${i}-${entry}`,
-      src: `images/${encPath(entry)}`,
-      title: baseName(entry),
-      description: '',
-      fileName: entry,
-      size: 0,
-    };
-  }
-  const fileName = entry.fileName || entry.file || entry.src || '';
-  return {
-    id: entry.id || `disk-${i}-${fileName}`,
-    src: entry.src ? encPath(entry.src) : `images/${encPath(fileName)}`,
-    title: entry.title || baseName(fileName) || `Concept ${i + 1}`,
-    description: entry.description || '',
-    fileName,
-    size: entry.size || 0,
-  };
-}
+/* ---------- auth ---------- */
+async function initAuth() {
+  const { data: { session } } = await sb.auth.getSession();
+  state.user = session?.user || null;
 
-async function loadManifest() {
-  try {
-    const res = await fetch('images/manifest.json', { cache: 'no-store' });
-    if (!res.ok) throw new Error('manifest HTTP ' + res.status);
-    const raw = await res.json();
-    const list = pickList(raw).map(toItem).filter(x => x.src);
-    if (!list.length) throw new Error('manifest empty');
-
-    state.items = list;
-    state.loadedFromDisk = true;
-    state.cur = 0;
-    if (raw && typeof raw.title === 'string' && raw.title.trim()) {
-      state.title = raw.title.trim();
-      $('#titleInput').value = state.title;
+  sb.auth.onAuthStateChange((_evt, session) => {
+    state.user = session?.user || null;
+    if (state.user) {
+      // just signed in — close modal, show edit
+      $('#signinModal').hidden = true;
+      $('#signinStatus').textContent = '';
+      if (state.edit) renderAll();
+    } else {
+      state.edit = false;
+      renderAll();
     }
-    return true;
-  } catch (err) {
-    console.warn('[concepts] manifest not loaded:', err.message);
-    return false;
+    renderTopbar();
+  });
+}
+
+async function signIn(email) {
+  const { error } = await sb.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: location.origin + location.pathname },
+  });
+  return error;
+}
+
+async function signOut() {
+  await sb.auth.signOut();
+  state.edit = false;
+  renderAll();
+}
+
+/* ---------- load / write concepts ---------- */
+async function loadConcepts() {
+  const { data, error } = await sb.from('concepts')
+    .select('*')
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.error('[concepts] load failed:', error.message);
+    state.items = [];
+    return;
   }
+
+  state.items = (data || []).map(r => ({
+    id: r.id,
+    title: r.title || 'Untitled',
+    description: r.description || '',
+    image_path: r.image_path,
+    src: sb.storage.from('concepts').getPublicUrl(r.image_path).data.publicUrl,
+    sort_order: r.sort_order,
+  }));
+}
+
+async function resizeImage(file) {
+  const max = CONFIG.maxImageDimension;
+  return new Promise((resolve) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      let { width, height } = img;
+      const scale = Math.min(1, max / Math.max(width, height));
+      width = Math.round(width * scale);
+      height = Math.round(height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      const isPng = file.type === 'image/png';
+      canvas.toBlob(
+        (blob) => resolve({ blob: blob || file, isPng }),
+        isPng ? 'image/png' : 'image/jpeg',
+        isPng ? undefined : CONFIG.jpegQuality
+      );
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); resolve({ blob: file, isPng: file.type === 'image/png' }); };
+    img.src = url;
+  });
+}
+
+async function uploadFiles(fileList) {
+  const files = [...fileList].filter(f => f.type.startsWith('image/'));
+  if (!files.length) return;
+
+  const status = $('#metaFiles');
+  status.textContent = `Uploading ${files.length}…`;
+
+  let order = state.items.length ? Math.max(...state.items.map(x => x.sort_order)) + 1 : 0;
+  let ok = 0;
+
+  for (const file of files) {
+    try {
+      const { blob, isPng } = await resizeImage(file);
+      const ext = isPng ? 'png' : 'jpg';
+      const path = `${Date.now()}-${uid()}.${ext}`;
+
+      const up = await sb.storage.from('concepts').upload(path, blob, {
+        contentType: isPng ? 'image/png' : 'image/jpeg',
+        cacheControl: '31536000',
+        upsert: false,
+      });
+      if (up.error) throw up.error;
+
+      const ins = await sb.from('concepts').insert({
+        title: file.name.replace(/\.[^/.]+$/, '').replace(/[-_]+/g, ' '),
+        description: '',
+        image_path: path,
+        sort_order: order++,
+      }).select().single();
+      if (ins.error) throw ins.error;
+      ok++;
+    } catch (e) {
+      console.error('[upload]', e);
+    }
+  }
+
+  await loadConcepts();
+  if (ok && state.items.length) {
+    // jump to the first newly added
+    state.cur = state.items.length - ok;
+    if (state.cur < 0) state.cur = 0;
+  }
+  renderAll();
+  toast(ok === files.length ? `Uploaded ${ok}` : `Uploaded ${ok} of ${files.length} — see console`);
+}
+
+async function saveDescription(id, description) {
+  const { error } = await sb.from('concepts').update({ description }).eq('id', id);
+  if (error) throw error;
+  const it = state.items.find(x => x.id === id);
+  if (it) it.description = description;
+}
+
+async function saveTitle(id, title) {
+  const { error } = await sb.from('concepts').update({ title }).eq('id', id);
+  if (error) throw error;
+  const it = state.items.find(x => x.id === id);
+  if (it) it.title = title;
+}
+
+async function deleteConcept(id) {
+  const it = state.items.find(x => x.id === id);
+  if (!it) return;
+  if (!confirm('Delete this concept and all its comments?')) return;
+
+  try {
+    await sb.storage.from('concepts').remove([it.image_path]);
+  } catch (e) { console.warn('[storage delete]', e); }
+
+  const { error } = await sb.from('concepts').delete().eq('id', id);
+  if (error) { toast('Delete failed'); return; }
+
+  await loadConcepts();
+  state.cur = Math.min(state.cur, Math.max(0, state.items.length - 1));
+  renderAll();
+  toast('Deleted');
+}
+
+async function persistOrder() {
+  // update each row's sort_order to its current index
+  const updates = state.items.map((it, i) =>
+    sb.from('concepts').update({ sort_order: i }).eq('id', it.id));
+  await Promise.all(updates);
+}
+
+async function reorder(fromId, toId) {
+  if (!fromId || fromId === toId) return;
+  const from = state.items.findIndex(x => x.id === fromId);
+  const to = state.items.findIndex(x => x.id === toId);
+  if (from === -1 || to === -1) return;
+  const arr = [...state.items];
+  const [it] = arr.splice(from, 1);
+  arr.splice(to, 0, it);
+  state.items = arr;
+  state.cur = to;
+  renderViewer(); renderThumbs(); renderComments();
+  await persistOrder();
+}
+
+async function moveItem(id, delta) {
+  const i = state.items.findIndex(x => x.id === id);
+  const j = i + delta;
+  if (i === -1 || j < 0 || j >= state.items.length) return;
+  const arr = [...state.items];
+  const [it] = arr.splice(i, 1);
+  arr.splice(j, 0, it);
+  state.items = arr;
+  state.cur = j;
+  renderViewer(); renderThumbs(); renderComments();
+  await persistOrder();
+}
+
+/* ---------- comments ---------- */
+async function loadComments(conceptId) {
+  if (!conceptId) { renderComments(); return; }
+  state.loadingComments = true;
+  renderComments();
+  const { data, error } = await sb.from('comments')
+    .select('*')
+    .eq('concept_id', conceptId)
+    .order('created_at', { ascending: true });
+  state.loadingComments = false;
+  if (error) { console.error('[comments]', error); state.comments[conceptId] = []; }
+  else state.comments[conceptId] = data || [];
+  renderComments();
+}
+
+async function postComment(conceptId, author, body) {
+  const { error } = await sb.from('comments').insert({
+    concept_id: conceptId,
+    author: author?.trim() || 'Anonymous',
+    body: body.trim(),
+  });
+  if (error) throw error;
+  await loadComments(conceptId);
+}
+
+async function deleteComment(id, conceptId) {
+  if (!confirm('Delete this comment?')) return;
+  const { error } = await sb.from('comments').delete().eq('id', id);
+  if (error) { toast('Delete failed'); return; }
+  await loadComments(conceptId);
 }
 
 /* ---------- rendering ---------- */
 function renderTopbar() {
   $('#brandTitle').textContent = state.title.split('—')[0].trim() || 'CONCEPT';
-  $('#brandMode').textContent  = state.edit ? 'owner • edit' : 'private view';
-  $('#countPill').textContent  = `${state.items.length} concept${state.items.length === 1 ? '' : 's'}`;
-  $('#modeToggle').textContent = state.edit ? 'Preview as client' : 'Open editor ?edit=1';
+  $('#brandMode').textContent = state.user ? 'owner' : 'review';
+  $('#countPill').textContent = `${state.items.length} concept${state.items.length === 1 ? '' : 's'}`;
+
+  const btn = $('#authBtn');
+  if (state.user) {
+    btn.textContent = 'Sign out';
+  } else {
+    btn.textContent = 'Sign in';
+  }
   document.title = state.title || 'Concept Viewer';
 }
 
@@ -444,14 +607,14 @@ function renderViewer() {
 
   if (!n) {
     v.className = 'viewer empty';
-    v.innerHTML = `<div style="text-align:center;padding:40px">
-      <div style="font-family:Georgia,serif;font-size:26px;margin-bottom:8px">No concepts yet</div>
-      <div style="color:var(--muted);font-size:12px;letter-spacing:.12em;text-transform:uppercase">
-        ${state.edit ? 'Use uploader above' : 'Add ?edit=1 to URL to upload'}
-      </div></div>`;
+    v.innerHTML = `<div class="empty-state">
+      <div class="big">No concepts yet</div>
+      <div class="sub">${state.user ? 'Use the uploader above' : 'Check back soon'}</div>
+    </div>`;
     $('#captionBar').hidden = true;
-    $('#feedbackBlock').hidden = true;
+    $('#descEditor').hidden = true;
     $('#dots').hidden = true;
+    $('#commentsBlock').hidden = true;
     return;
   }
 
@@ -466,7 +629,7 @@ function renderViewer() {
     <button class="nav-btn right" data-nav="1"  ${state.cur === n - 1 ? 'disabled' : ''} aria-label="Next">›</button>`;
 
   $('#captionBar').hidden = false;
-  $('#captionTitle').textContent = it.title || 'Untitled concept';
+  $('#captionTitle').textContent = it.title || 'Untitled';
 
   const desc = $('#captionDesc');
   if (it.description && it.description.trim()) {
@@ -476,15 +639,18 @@ function renderViewer() {
     desc.textContent = '';
     desc.hidden = true;
   }
+  $('#captionMeta').textContent = state.title;
+  $('#deleteBtn').hidden = !state.user;
 
-  $('#captionMeta').textContent =
-    `${state.title} • ${it.fileName || ''} • drag or swipe to navigate`;
-  $('#deleteBtn').hidden = !state.edit;
-
-  // feedback box — repopulate from per-concept draft
-  $('#feedbackBlock').hidden = false;
-  $('#fbText').value = state.feedback[it.id] || '';
-  setFbStatus('');
+  // description editor (edit mode only)
+  const de = $('#descEditor');
+  if (state.user) {
+    de.hidden = false;
+    $('#descInput').value = it.description || '';
+    $('#descStatus').textContent = '';
+  } else {
+    de.hidden = true;
+  }
 
   const dots = $('#dots');
   dots.hidden = n <= 1;
@@ -493,12 +659,42 @@ function renderViewer() {
              aria-label="Go to ${i + 1}"></button>`).join('');
 }
 
+function renderComments() {
+  const n = state.items.length;
+  const block = $('#commentsBlock');
+  if (!n) { block.hidden = true; return; }
+  block.hidden = false;
+
+  const it = state.items[state.cur];
+  const list = state.comments[it.id];
+  const count = list ? list.length : 0;
+  $('#commentCount').textContent = state.loadingComments ? 'Loading…'
+    : `${count} comment${count === 1 ? '' : 's'}`;
+
+  const wrap = $('#commentList');
+  if (state.loadingComments) { wrap.innerHTML = ''; return; }
+  if (!count) {
+    wrap.innerHTML = `<div class="comment-empty">No feedback yet — be the first.</div>`;
+    return;
+  }
+
+  wrap.innerHTML = list.map(c => `
+    <div class="comment">
+      <div class="comment-head">
+        <span class="comment-author">${esc(c.author || 'Anonymous')}</span>
+        <span class="comment-time">${esc(timeAgo(c.created_at))}${
+          state.user ? ` · <button class="icon-btn" style="width:auto;height:auto;border:none;padding:0;background:none;color:var(--muted);font-size:10px;letter-spacing:.08em;text-transform:uppercase" data-delcomment="${esc(c.id)}">delete</button>` : ''
+        }</span>
+      </div>
+      <div class="comment-body">${esc(c.body)}</div>
+    </div>`).join('');
+}
+
 function renderThumbs() {
   const wrap = $('#thumbs');
-  if (!state.edit || !state.items.length) { wrap.hidden = true; return; }
+  if (!state.user || !state.items.length) { wrap.hidden = true; return; }
   wrap.hidden = false;
-  $('#thumbsHead').textContent =
-    `Sequence — drag to reorder • ${state.items.length} concepts`;
+  $('#thumbsHead').textContent = `Order — ${state.items.length} concepts`;
 
   $('#thumbStrip').innerHTML = state.items.map((it, i) => `
     <div class="thumb ${i === state.cur ? 'active' : ''}" data-id="${esc(it.id)}" draggable="true">
@@ -507,42 +703,28 @@ function renderThumbs() {
         <div class="thumb-index">${String(i + 1).padStart(2,'0')}</div>
       </div>
       <div class="thumb-body">
-        <input value="${esc(it.title)}" data-rename="${esc(it.id)}" spellcheck="false"
-               placeholder="Title">
-        <textarea data-desc="${esc(it.id)}" spellcheck="false"
-                  placeholder="Add a description…">${esc(it.description || '')}</textarea>
+        <input value="${esc(it.title)}" data-rename="${esc(it.id)}" spellcheck="false" placeholder="Title">
+        <textarea data-desc="${esc(it.id)}" spellcheck="false" placeholder="Description…">${esc(it.description || '')}</textarea>
         <div class="thumb-actions">
           <button class="icon-btn" data-move="-1" title="Move left"  ${i === 0 ? 'disabled' : ''}>←</button>
           <button class="icon-btn" data-move="1"  title="Move right" ${i === state.items.length - 1 ? 'disabled' : ''}>→</button>
           <button class="icon-btn" data-del="${esc(it.id)}" title="Delete">✕</button>
-          <span style="margin-left:auto;font-size:9px;color:var(--muted)">
-            ${it.size ? (it.size / 1024).toFixed(0) + 'kb' : ''}
-          </span>
         </div>
       </div>
     </div>`).join('');
 }
 
 function renderEditBlock() {
-  $('#editBlock').hidden = !state.edit;
-  $('#clientFooter').hidden = state.edit;
-
+  $('#editBlock').hidden = !state.user;
+  $('#studyTitle').value = state.title;
   const n = state.items.length;
-  const bytes = state.items.reduce((a, x) => a + (x.size || 0), 0);
-  $('#metaFiles').textContent = `${n} file${n === 1 ? '' : 's'} • ${
-    bytes ? (bytes / 1024 / 1024).toFixed(2) + ' MB' : 'disk or session only'}`;
-  $('#metaWarn').textContent = state.loadedFromDisk && !bytes
-    ? 'Loaded from images/manifest.json'
-    : 'In-memory preview — export to keep';
-
-  $('#dlHtml').disabled = !n;
-  $('#dlZip').disabled  = !n;
-  $('#copyBtn').disabled = !n;
+  $('#metaFiles').textContent = `${n} concept${n === 1 ? '' : 's'}`;
 }
 
 function renderAll() {
   renderTopbar();
   renderViewer();
+  renderComments();
   renderThumbs();
   renderEditBlock();
 }
@@ -550,493 +732,76 @@ function renderAll() {
 /* ---------- navigation ---------- */
 function go(delta) {
   state.cur = Math.max(0, Math.min(state.cur + delta, state.items.length - 1));
-  renderViewer(); renderThumbs();
+  renderViewer(); renderThumbs(); renderComments();
+  const it = state.items[state.cur];
+  if (it) loadComments(it.id);
 }
 function goto(i) {
   state.cur = Math.max(0, Math.min(i, state.items.length - 1));
-  renderViewer(); renderThumbs();
-}
-
-/* ---------- upload ---------- */
-const readAsDataURL = (file) => new Promise((ok, no) => {
-  const fr = new FileReader();
-  fr.onload = () => ok(fr.result);
-  fr.onerror = no;
-  fr.readAsDataURL(file);
-});
-
-async function addFiles(fileList) {
-  const files = [...fileList].filter(f => f.type.startsWith('image/'));
-  if (!files.length) return;
-
-  const added = [];
-  for (const f of files) {
-    added.push({
-      id: uid(),
-      src: await readAsDataURL(f),
-      title: baseName(f.name),
-      description: '',
-      fileName: f.name,
-      size: f.size,
-    });
-  }
-
-  state.items = state.loadedFromDisk ? [...state.items, ...added] : added;
-  state.loadedFromDisk = false;
-  state.cur = 0;
-  renderAll();
-  toast(`Added ${added.length} concept${added.length === 1 ? '' : 's'}`);
-}
-
-function removeItem(id) {
-  const idx = state.items.findIndex(x => x.id === id);
-  if (idx === -1) return;
-  const next = state.items.filter(x => x.id !== id);
-  state.items = next;
-  delete state.feedback[id];
-  if (!next.length) state.cur = 0;
-  else if (idx < state.cur) state.cur -= 1;
-  else if (state.cur >= next.length) state.cur = next.length - 1;
-  renderAll();
-}
-
-function moveItem(id, delta) {
-  const i = state.items.findIndex(x => x.id === id);
-  const j = i + delta;
-  if (i === -1 || j < 0 || j >= state.items.length) return;
-  const arr = [...state.items];
-  const [it] = arr.splice(i, 1);
-  arr.splice(j, 0, it);
-  state.items = arr;
-  if (state.cur === i) state.cur = j;
-  else if (state.cur === j) state.cur = i;
-  renderViewer(); renderThumbs();
-}
-
-function reorder(fromId, toId) {
-  if (!fromId || fromId === toId) return;
-  const from = state.items.findIndex(x => x.id === fromId);
-  const to   = state.items.findIndex(x => x.id === toId);
-  if (from === -1 || to === -1) return;
-  const arr = [...state.items];
-  const [it] = arr.splice(from, 1);
-  arr.splice(to, 0, it);
-  state.items = arr;
-  state.cur = to;
-  renderViewer(); renderThumbs();
-}
-
-/* ---------- feedback ---------- */
-function setFbStatus(msg, kind = '') {
-  const el = $('#fbStatus');
-  el.textContent = msg;
-  el.className = 'fb-status' + (kind ? ' ' + kind : '');
-}
-
-function feedbackText(it) {
-  const note = ($('#fbText').value || '').trim();
-  return `Concept: ${it.title}${it.description ? `\n(${it.description})` : ''}\n\n${note}`;
-}
-
-async function copyFeedback() {
+  renderViewer(); renderThumbs(); renderComments();
   const it = state.items[state.cur];
-  if (!it) return false;
-  const text = feedbackText(it);
-  try {
-    if (!navigator.clipboard?.writeText) throw new Error('no clipboard');
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch {
-    window.prompt('Copy your feedback:', text);
-    return false;
-  }
+  if (it) loadComments(it.id);
 }
 
-async function sendFeedback() {
-  const it = state.items[state.cur];
-  if (!it) return;
-
-  const note = ($('#fbText').value || '').trim();
-  if (!note) { setFbStatus('Write something first', 'err'); return; }
-
-  if (CONFIG.web3formsKey) {
-    setFbStatus('Sending…');
-    try {
-      const res = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({
-          access_key: CONFIG.web3formsKey,
-          subject: `Feedback — ${state.title} — ${it.title}`,
-          from_name: 'Concept Viewer',
-          concept: it.title,
-          concept_description: it.description || '',
-          feedback: note,
-          page: location.href,
-        }),
-      });
-      const json = await res.json();
-      if (!json.success) throw new Error(json.message || 'send failed');
-      state.feedback[it.id] = '';
-      $('#fbText').value = '';
-      setFbStatus('✓ Sent — thank you', 'ok');
-      return;
-    } catch (e) {
-      console.warn('[feedback]', e);
-      const copied = await copyFeedback();
-      setFbStatus(copied ? 'Couldn\u2019t send — copied instead'
-                         : 'Couldn\u2019t send — copy it manually', 'err');
-      return;
-    }
-  }
-
-  if (CONFIG.feedbackEmail) {
-    const subject = encodeURIComponent(`Feedback — ${state.title} — ${it.title}`);
-    const body = encodeURIComponent(
-      `Concept: ${it.title}\n\n${note}\n\n—\n${location.href}`);
-    location.href = `mailto:${CONFIG.feedbackEmail}?subject=${subject}&body=${body}`;
-    setFbStatus('Opening your email app…');
-    return;
-  }
-
-  const copied = await copyFeedback();
-  setFbStatus(copied ? 'Copied — paste it wherever you like'
-                     : 'Copy it manually', copied ? 'ok' : 'err');
-}
-
-/* ---------- export: inline images ---------- */
-async function toDataURL(src) {
-  if (src.startsWith('data:')) return src;
-  const res = await fetch(src);
-  if (!res.ok) throw new Error('fetch ' + res.status);
-  const blob = await res.blob();
-  return new Promise((ok, no) => {
-    const fr = new FileReader();
-    fr.onload = () => ok(fr.result);
-    fr.onerror = no;
-    fr.readAsDataURL(blob);
-  });
-}
-
-async function inlineAll(items) {
-  const out = [];
-  for (const it of items) {
-    try { out.push({ ...it, src: await toDataURL(it.src) }); }
-    catch (e) { console.warn('[concepts] inline failed:', it.src, e.message); out.push(it); }
-  }
-  return out;
-}
-
-/* ---------- export: standalone viewer ---------- */
-function buildViewerHTML(items, title) {
-  const data = JSON.stringify(items.map(m => ({
-    title: m.title, description: m.description || '', src: m.src,
-  }))).replace(/</g, '\\u003c');
-
-  const fbConfig = JSON.stringify({
-    key: CONFIG.web3formsKey || '',
-    email: CONFIG.feedbackEmail || '',
-  }).replace(/</g, '\\u003c');
-
-  const safeTitle = esc(title);
-
-  return `<!doctype html>
-<html lang="en"><head><meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>${safeTitle}</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;background:#FAF9F7;color:#111;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif}
-.wrap{max-width:1280px;margin:0 auto;padding:40px 24px}
-h1{font-family:Georgia,serif;font-weight:300;letter-spacing:.12em;font-size:12px;
-   text-transform:uppercase;color:#8A8A88;margin:0 0 32px}
-.viewer{position:relative;aspect-ratio:4/3;background:#fff;border:1px solid #EAE8E3;overflow:hidden;
-        display:flex;align-items:center;justify-content:center}
-.viewer img{width:100%;height:100%;object-fit:contain;background:#fff;display:block}
-.nav{position:absolute;inset:0;display:flex;justify-content:space-between;align-items:center;pointer-events:none}
-.nav button{pointer-events:auto;background:rgba(255,255,255,.9);border:1px solid #EAE8E3;
-  border-radius:999px;width:44px;height:44px;display:grid;place-items:center;cursor:pointer;
-  margin:0 16px;font-size:18px;line-height:1}
-.nav button:disabled{opacity:.3;pointer-events:none}
-.counter{position:absolute;top:16px;right:16px;background:#fff;border:1px solid #EAE8E3;
-  padding:6px 10px;font-size:11px;letter-spacing:.1em}
-.dots{display:flex;gap:8px;justify-content:center;margin-top:20px;flex-wrap:wrap}
-.dot{width:24px;height:2px;background:#EAE8E3;border:none;padding:0;cursor:pointer;transition:all .3s}
-.dot.active{background:#111;width:40px}
-.caption{margin-top:20px;font-family:Georgia,serif;font-size:24px;line-height:1.15;letter-spacing:-.015em}
-.desc{margin-top:8px;font-size:14px;line-height:1.6;color:#3A3A38;max-width:62ch;white-space:pre-wrap}
-.meta{margin-top:12px;color:#8A8A88;font-size:11px;letter-spacing:.12em;text-transform:uppercase}
-.feedback{margin-top:24px;border:1px solid #EAE8E3;border-radius:14px;background:#fff;padding:16px}
-.feedback label{display:block;font-size:10px;letter-spacing:.16em;text-transform:uppercase;
-  color:#8A8A88;font-weight:500;margin-bottom:10px}
-.feedback textarea{width:100%;min-height:88px;resize:vertical;border:1px solid #D6D2CC;
-  border-radius:10px;padding:12px 14px;font-size:13px;line-height:1.5;outline:none;
-  transition:border .2s;background:#fff;color:#111;font-family:inherit}
-.feedback textarea:focus{border-color:#111}
-.feedback-actions{display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap}
-.btn{appearance:none;border:1px solid #111;background:#111;color:#fff;border-radius:999px;
-  padding:8px 14px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;font-weight:500;
-  cursor:pointer;font-family:inherit}
-.btn.ghost{background:#fff;color:#111;border-color:#D6D2CC}
-.fb-status{font-size:11px;color:#8A8A88;letter-spacing:.06em}
-.fb-status.ok{color:#111}
-.fb-status.err{color:#B42318}
-</style></head><body><div class="wrap">
-<h1>${safeTitle}</h1>
-<div class="viewer" id="v">
-  <img id="img" alt=""/>
-  <div class="counter" id="counter"></div>
-  <div class="nav"><button id="prev">‹</button><button id="next">›</button></div>
-</div>
-<div class="caption" id="cap"></div>
-<div class="desc" id="desc"></div>
-<div class="meta" id="meta"></div>
-<div class="dots" id="dots"></div>
-<div class="feedback">
-  <label for="fb">Leave feedback on this concept</label>
-  <textarea id="fb" placeholder="What works, what doesn't, what you'd change…"></textarea>
-  <div class="feedback-actions">
-    <button class="btn" id="fbSend">Send feedback</button>
-    <button class="btn ghost" id="fbCopy">Copy</button>
-    <span class="fb-status" id="fbStatus"></span>
-  </div>
-</div>
-<script>
-const data=${data};
-const FB=${fbConfig};
-let cur=0;
-const img=document.getElementById('img'),cap=document.getElementById('cap'),
-      desc=document.getElementById('desc'),meta=document.getElementById('meta'),
-      counter=document.getElementById('counter'),dots=document.getElementById('dots'),
-      fb=document.getElementById('fb'),fbStatus=document.getElementById('fbStatus');
-const drafts={};
-
-function setStatus(m,k){fbStatus.textContent=m;fbStatus.className='fb-status'+(k?' '+k:'')}
-function render(){
-  if(!data.length){img.removeAttribute('src');cap.textContent='No concepts';
-    document.querySelector('.feedback').style.display='none';return}
-  const d=data[cur];
-  img.src=d.src; img.alt=d.title||'';
-  cap.textContent=d.title||'Untitled';
-  if(d.description&&d.description.trim()){desc.textContent=d.description;desc.style.display='block'}
-  else{desc.textContent='';desc.style.display='none'}
-  meta.textContent=(cur+1)+' / '+data.length+' — '+d.title;
-  counter.textContent=String(cur+1).padStart(2,'0')+' / '+String(data.length).padStart(2,'0');
-  dots.innerHTML=data.map((_,i)=>'<button class="dot '+(i===cur?'active':'')+'" data-i="'+i+'"></button>').join('');
-  document.getElementById('prev').disabled=cur===0;
-  document.getElementById('next').disabled=cur===data.length-1;
-  fb.value=drafts[cur]||'';
-  setStatus('');
-}
-fb.addEventListener('input',()=>{drafts[cur]=fb.value});
-document.getElementById('prev').onclick=()=>{cur=Math.max(0,cur-1);render()};
-document.getElementById('next').onclick=()=>{cur=Math.min(data.length-1,cur+1);render()};
-dots.addEventListener('click',e=>{const d=e.target.closest('.dot');
-  if(d){cur=parseInt(d.dataset.i,10);render()}});
-document.addEventListener('keydown',e=>{
-  if(e.target.tagName==='TEXTAREA'||e.target.tagName==='INPUT')return;
-  if(e.metaKey||e.ctrlKey||e.altKey)return;
-  if(e.key==='ArrowRight'){cur=Math.min(data.length-1,cur+1);render()}
-  if(e.key==='ArrowLeft'){cur=Math.max(0,cur-1);render()}});
-let sx=null;
-img.addEventListener('touchstart',e=>{sx=e.touches[0].clientX},{passive:true});
-img.addEventListener('touchend',e=>{
-  if(sx===null)return;
-  const dx=e.changedTouches[0].clientX-sx;
-  if(Math.abs(dx)>50){ if(dx<0)cur=Math.min(data.length-1,cur+1); else cur=Math.max(0,cur-1); render() }
-  sx=null});
-
-async function doCopy(){
-  const d=data[cur];
-  const text='Concept: '+(d.title||'')+(d.description?'\\n('+d.description+')':'')+'\\n\\n'+(fb.value||'').trim();
-  try{ if(!navigator.clipboard?.writeText) throw 0;
-    await navigator.clipboard.writeText(text); return true }
-  catch{ window.prompt('Copy your feedback:',text); return false }
-}
-document.getElementById('fbCopy').onclick=async()=>{
-  const ok=await doCopy();
-  setStatus(ok?'Copied':'Copy it manually',ok?'ok':'err');
-};
-document.getElementById('fbSend').onclick=async()=>{
-  const d=data[cur];
-  const note=(fb.value||'').trim();
-  if(!note){setStatus('Write something first','err');return}
-  if(FB.key){
-    setStatus('Sending…');
-    try{
-      const r=await fetch('https://api.web3forms.com/submit',{method:'POST',
-        headers:{'Content-Type':'application/json',Accept:'application/json'},
-        body:JSON.stringify({access_key:FB.key,subject:'Feedback — ${safeTitle} — '+(d.title||''),
-          from_name:'Concept Viewer',concept:d.title||'',concept_description:d.description||'',
-          feedback:note,page:location.href})});
-      const j=await r.json();
-      if(!j.success) throw new Error(j.message||'send failed');
-      drafts[cur]=''; fb.value='';
-      setStatus('✓ Sent — thank you','ok');
-      return;
-    }catch(err){
-      const ok=await doCopy();
-      setStatus(ok?'Couldn\\u2019t send — copied instead':'Couldn\\u2019t send — copy manually','err');
-      return;
-    }
-  }
-  if(FB.email){
-    const s=encodeURIComponent('Feedback — ${safeTitle} — '+(d.title||''));
-    const b=encodeURIComponent('Concept: '+(d.title||'')+'\\n\\n'+note+'\\n\\n—\\n'+location.href);
-    location.href='mailto:'+FB.email+'?subject='+s+'&body='+b;
-    setStatus('Opening your email app…');
-    return;
-  }
-  const ok=await doCopy();
-  setStatus(ok?'Copied — paste it wherever you like':'Copy it manually',ok?'ok':'err');
-};
-render();
-<\/script></div></body></html>`;
-}
-
-function downloadBlob(blob, name) {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = name;
-  document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 4000);
-}
-
-async function exportHTML() {
-  if (!state.items.length) return;
-  const btn = $('#dlHtml'); const label = btn.textContent;
-  btn.disabled = true; btn.textContent = 'Embedding…';
-  try {
-    const inlined = await inlineAll(state.items);
-    const html = buildViewerHTML(inlined, state.title);
-    downloadBlob(new Blob([html], { type: 'text/html' }),
-                 `${slug(state.title)}-viewer.html`);
-    toast('Standalone HTML downloaded');
-  } catch (e) {
-    console.error(e);
-    toast('Export failed — see console');
-  } finally {
-    btn.disabled = false; btn.textContent = label;
-  }
-}
-
-let jszipPromise = null;
-function loadJSZip() {
-  if (window.JSZip) return Promise.resolve(window.JSZip);
-  if (jszipPromise) return jszipPromise;
-  jszipPromise = new Promise((resolve) => {
-    const s = document.createElement('script');
-    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
-    s.onload = () => { $('#zipStatus').textContent = 'JSZip ready.'; resolve(window.JSZip); };
-    s.onerror = () => { $('#zipStatus').textContent = 'JSZip unavailable.'; resolve(null); };
-    document.head.appendChild(s);
-  });
-  return jszipPromise;
-}
-
-async function exportZIP() {
-  if (!state.items.length) return;
-  const btn = $('#dlZip'); const label = btn.textContent;
-  btn.disabled = true; btn.textContent = 'Packing…';
-  try {
-    const JSZip = await loadJSZip();
-    if (!JSZip) { await exportHTML(); return; }
-
-    const inlined = await inlineAll(state.items);
-    const zip = new JSZip();
-
-    zip.file('index.html', buildViewerHTML(inlined, state.title));
-    zip.file('manifest.json', JSON.stringify({
-      title: state.title,
-      count: inlined.length,
-      created: new Date().toISOString(),
-      images: inlined.map((m, i) => ({
-        fileName: `${String(i + 1).padStart(2, '0')}-${m.fileName || 'concept.png'}`,
-        title: m.title,
-        description: m.description || '',
-      })),
-    }, null, 2));
-
-    const folder = zip.folder('images');
-    inlined.forEach((m, i) => {
-      const name = `${String(i + 1).padStart(2, '0')}-${m.fileName || 'concept.png'}`;
-      const match = m.src.match(/^data:(.+?);base64,(.+)$/);
-      if (match) folder.file(name, match[2], { base64: true });
-    });
-
-    const blob = await zip.generateAsync({ type: 'blob' });
-    downloadBlob(blob, `${slug(state.title)}.zip`);
-    toast('ZIP downloaded');
-  } catch (e) {
-    console.error(e);
-    toast('ZIP failed — falling back to HTML');
-    await exportHTML();
-  } finally {
-    btn.disabled = false; btn.textContent = label;
-  }
-}
-
-async function copyTempLink() {
-  if (!state.items.length) return;
-  const inlined = await inlineAll(state.items);
-  const url = URL.createObjectURL(
-    new Blob([buildViewerHTML(inlined, state.title)], { type: 'text/html' }));
-  try {
-    if (!navigator.clipboard?.writeText) throw new Error('no clipboard API');
-    await navigator.clipboard.writeText(url);
-    toast('Temporary link copied');
-  } catch {
-    window.prompt('Temporary preview URL (valid until tab closes):', url);
-  }
-}
-
-function setEdit(on, updateURL = true) {
-  state.edit = !!on;
-  if (updateURL) {
-    const url = new URL(location.href);
-    if (state.edit) url.searchParams.set('edit', '1');
-    else url.searchParams.delete('edit');
-    history.replaceState(null, '', url);
-  }
-  renderAll();
-}
-
-/* ---------- wiring ---------- */
+/* ---------- wire ---------- */
 function wire() {
-  $('#modeToggle').addEventListener('click', () => setEdit(!state.edit));
+  // auth
+  $('#authBtn').addEventListener('click', async () => {
+    if (state.user) {
+      if (confirm('Sign out?')) await signOut();
+    } else {
+      $('#signinModal').hidden = false;
+      $('#signinEmail').focus();
+    }
+  });
 
+  $('#signinSend').addEventListener('click', async () => {
+    const email = $('#signinEmail').value.trim();
+    if (!email) return;
+    $('#signinStatus').textContent = 'Sending…';
+    const err = await signIn(email);
+    $('#signinStatus').textContent = err ? err.message : 'Check your email for the magic link.';
+  });
+  $('#signinEmail').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') $('#signinSend').click();
+  });
+
+  document.querySelectorAll('[data-close]').forEach(b => {
+    b.addEventListener('click', () => { $('#' + b.dataset.close).hidden = true; });
+  });
+  document.querySelectorAll('.modal-backdrop').forEach(bd => {
+    bd.addEventListener('click', (e) => { if (e.target === bd) bd.hidden = true; });
+  });
+
+  // study title
+  $('#studyTitle').addEventListener('change', (e) => {
+    state.title = e.target.value || CONFIG.studyTitle;
+    renderTopbar();
+  });
+
+  // upload
   const uploader = $('#uploader');
   const fileInput = $('#fileInput');
   $('#uploadBtn').addEventListener('click', () => fileInput.click());
   fileInput.addEventListener('change', (e) => {
-    if (e.target.files) addFiles(e.target.files);
+    if (e.target.files) uploadFiles(e.target.files);
     e.target.value = '';
   });
-  $('#clearBtn').addEventListener('click', () => {
-    state.items = []; state.cur = 0; state.loadedFromDisk = false;
-    state.feedback = {}; renderAll();
-  });
 
-  let dragDepth = 0;
+  let depth = 0;
   uploader.addEventListener('dragenter', (e) => {
-    e.preventDefault(); dragDepth++; uploader.classList.add('drag');
+    e.preventDefault(); depth++; uploader.classList.add('drag');
   });
   uploader.addEventListener('dragleave', () => {
-    dragDepth = Math.max(0, dragDepth - 1);
-    if (!dragDepth) uploader.classList.remove('drag');
+    depth = Math.max(0, depth - 1); if (!depth) uploader.classList.remove('drag');
   });
   uploader.addEventListener('dragover', (e) => e.preventDefault());
   uploader.addEventListener('drop', (e) => {
-    e.preventDefault(); dragDepth = 0; uploader.classList.remove('drag');
-    if (e.dataTransfer?.files?.length) addFiles(e.dataTransfer.files);
+    e.preventDefault(); depth = 0; uploader.classList.remove('drag');
+    if (e.dataTransfer?.files?.length) uploadFiles(e.dataTransfer.files);
   });
 
-  $('#titleInput').addEventListener('input', (e) => {
-    state.title = e.target.value;
-    renderTopbar();
-    if (state.items.length) renderViewer();
-  });
-
+  // viewer nav
   $('#viewer').addEventListener('click', (e) => {
     const b = e.target.closest('[data-nav]');
     if (b) go(parseInt(b.dataset.nav, 10));
@@ -1045,19 +810,69 @@ function wire() {
     const d = e.target.closest('[data-dot]');
     if (d) goto(parseInt(d.dataset.dot, 10));
   });
+
+  // delete concept
   $('#deleteBtn').addEventListener('click', () => {
-    if (state.items[state.cur]) removeItem(state.items[state.cur].id);
+    const it = state.items[state.cur];
+    if (it) deleteConcept(it.id);
   });
 
-  // feedback
-  $('#fbText').addEventListener('input', (e) => {
+  // description editor
+  $('#descSave').addEventListener('click', async () => {
     const it = state.items[state.cur];
-    if (it) state.feedback[it.id] = e.target.value;
+    if (!it) return;
+    const val = $('#descInput').value;
+    $('#descStatus').textContent = 'Saving…';
+    try {
+      await saveDescription(it.id, val);
+      $('#descStatus').textContent = '✓ Saved';
+      renderViewer(); renderThumbs();
+      setTimeout(() => { $('#descStatus').textContent = ''; }, 1500);
+    } catch (e) {
+      console.error(e);
+      $('#descStatus').textContent = 'Save failed';
+    }
   });
-  $('#fbSend').addEventListener('click', sendFeedback);
-  $('#fbCopy').addEventListener('click', async () => {
-    const ok = await copyFeedback();
-    setFbStatus(ok ? 'Copied' : 'Copy it manually', ok ? 'ok' : 'err');
+  // auto-save on blur too
+  $('#descInput').addEventListener('blur', async () => {
+    const it = state.items[state.cur];
+    if (!it) return;
+    const val = $('#descInput').value;
+    if (val === (it.description || '')) return;
+    try { await saveDescription(it.id, val); renderViewer(); renderThumbs(); }
+    catch (e) { console.error(e); }
+  });
+
+  // comment form
+  $('#commentForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const it = state.items[state.cur];
+    if (!it) return;
+    const body = $('#commentBody').value.trim();
+    if (!body) return;
+    const author = $('#commentName').value;
+    const status = $('#commentStatus');
+    $('#commentSubmit').disabled = true;
+    status.textContent = 'Posting…'; status.className = 'comment-status';
+    try {
+      await postComment(it.id, author, body);
+      $('#commentBody').value = '';
+      status.textContent = '✓ Posted'; status.className = 'comment-status ok';
+      setTimeout(() => { status.textContent = ''; status.className = 'comment-status'; }, 1500);
+    } catch (err) {
+      console.error(err);
+      status.textContent = 'Post failed'; status.className = 'comment-status err';
+    } finally {
+      $('#commentSubmit').disabled = false;
+    }
+  });
+
+  // delete comment (delegated)
+  $('#commentList').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-delcomment]');
+    if (!b) return;
+    const it = state.items[state.cur];
+    if (it) deleteComment(b.dataset.delcomment, it.id);
   });
 
   // thumbs
@@ -1066,25 +881,38 @@ function wire() {
     const rin = e.target.closest('[data-rename]');
     if (rin) {
       const it = state.items.find(x => x.id === rin.dataset.rename);
-      if (it) { it.title = rin.value; if (state.items[state.cur] === it) renderViewer(); }
+      if (it) it.title = rin.value;
       return;
     }
     const din = e.target.closest('[data-desc]');
     if (din) {
       const it = state.items.find(x => x.id === din.dataset.desc);
-      if (it) { it.description = din.value; if (state.items[state.cur] === it) renderViewer(); }
+      if (it) it.description = din.value;
+    }
+  });
+  strip.addEventListener('change', async (e) => {
+    const rin = e.target.closest('[data-rename]');
+    if (rin) {
+      try { await saveTitle(rin.dataset.rename, rin.value); renderViewer(); renderComments(); }
+      catch (err) { console.error(err); toast('Save failed'); }
+      return;
+    }
+    const din = e.target.closest('[data-desc]');
+    if (din) {
+      try { await saveDescription(din.dataset.desc, din.value); renderViewer(); }
+      catch (err) { console.error(err); toast('Save failed'); }
     }
   });
   strip.addEventListener('click', (e) => {
     const card = e.target.closest('.thumb');
     if (!card) return;
     const id = card.dataset.id;
-
-    if (e.target.closest('[data-del]')) { removeItem(id); return; }
+    if (e.target.closest('[data-del]')) { deleteConcept(id); return; }
     const mv = e.target.closest('[data-move]');
     if (mv) { moveItem(id, parseInt(mv.dataset.move, 10)); return; }
     if (e.target.closest('input') || e.target.closest('textarea')) return;
-    goto(state.items.findIndex(x => x.id === id));
+    const i = state.items.findIndex(x => x.id === id);
+    if (i >= 0) goto(i);
   });
   strip.addEventListener('dragstart', (e) => {
     const card = e.target.closest('.thumb');
@@ -1108,13 +936,13 @@ function wire() {
 
   // swipe
   const viewer = $('#viewer');
-  let swipeX = null;
-  viewer.addEventListener('touchstart', (e) => { swipeX = e.touches[0].clientX; }, { passive: true });
+  let sx = null;
+  viewer.addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; }, { passive: true });
   viewer.addEventListener('touchend', (e) => {
-    if (swipeX === null) return;
-    const dx = e.changedTouches[0].clientX - swipeX;
+    if (sx === null) return;
+    const dx = e.changedTouches[0].clientX - sx;
     if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1);
-    swipeX = null;
+    sx = null;
   });
 
   // keyboard
@@ -1123,35 +951,30 @@ function wire() {
     if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
-    if (e.key === 'ArrowLeft')  { e.preventDefault(); go(-1); }
-    if (e.key === 'Escape') $('#instrModal').hidden = true;
-  });
-
-  // exports
-  $('#dlHtml').addEventListener('click', exportHTML);
-  $('#dlZip').addEventListener('click', exportZIP);
-  $('#instrDlHtml').addEventListener('click', () => { $('#instrModal').hidden = true; exportHTML(); });
-  $('#instrDlZip').addEventListener('click',  () => { $('#instrModal').hidden = true; exportZIP(); });
-  $('#copyBtn').addEventListener('click', copyTempLink);
-
-  // modals
-  $('#instrBtn').addEventListener('click', () => { $('#instrModal').hidden = false; });
-  document.querySelectorAll('[data-close]').forEach(b => {
-    b.addEventListener('click', () => { $('#' + b.dataset.close).hidden = true; });
-  });
-  document.querySelectorAll('.modal-backdrop').forEach(bd => {
-    bd.addEventListener('click', (e) => { if (e.target === bd) bd.hidden = true; });
+    if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+    if (e.key === 'Escape') $('#signinModal').hidden = true;
   });
 }
 
 /* ---------- boot ---------- */
 (async function boot() {
-  setEdit(new URLSearchParams(location.search).get('edit') === '1', false);
+  if (!CONFIG.supabaseUrl || !CONFIG.supabaseAnonKey) {
+    document.body.innerHTML = `<div style="padding:60px;font-family:system-ui;max-width:600px;margin:0 auto">
+      <h2 style="font-family:Georgia,serif;font-weight:400">Almost there</h2>
+      <p>Open <code>index.html</code> and set <code>CONFIG.supabaseUrl</code> and
+      <code>CONFIG.supabaseAnonKey</code> near the top of the script.</p></div>`;
+    return;
+  }
+
   wire();
+  await initAuth();
   renderAll();
-  await loadManifest();
+
+  await loadConcepts();
   renderAll();
-  loadJSZip();
+
+  const it = state.items[state.cur];
+  if (it) loadComments(it.id);
 })();
 </script>
 </body>
