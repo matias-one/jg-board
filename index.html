@@ -82,6 +82,24 @@
   .nav-btn:disabled{opacity:.3;pointer-events:none}
   .nav-btn.left{left:14px} .nav-btn.right{right:14px}
 
+  /* Concept strip — always visible, Instagram-style preview row */
+  .concept-strip{margin-top:14px;display:flex;gap:10px;overflow-x:auto;
+    padding:4px 2px 10px;scrollbar-width:none}
+  .concept-strip::-webkit-scrollbar{display:none}
+  .strip-tile{flex:0 0 auto;width:96px;height:72px;border:1px solid var(--line);
+    border-radius:10px;overflow:hidden;padding:0;background:var(--surface);cursor:pointer;
+    position:relative;transition:all .2s;opacity:.55;display:block}
+  .strip-tile:hover{opacity:.9;border-color:var(--line-strong)}
+  .strip-tile.active{opacity:1;border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+  .strip-tile img{width:100%;height:100%;object-fit:cover;display:block}
+  .strip-num{position:absolute;top:4px;left:4px;background:rgba(255,255,255,.92);
+    border-radius:4px;padding:1px 5px;font-size:9px;letter-spacing:.08em;font-weight:600;
+    color:var(--ink)}
+  .strip-badge{position:absolute;bottom:4px;right:4px;background:var(--ink);color:#fff;
+    border-radius:999px;padding:1px 7px;font-size:9px;font-weight:600;letter-spacing:.04em}
+  .strip-caption{font-size:10px;color:var(--muted);letter-spacing:.16em;
+    text-transform:uppercase;margin-bottom:8px}
+
   .caption-bar{margin-top:18px;display:flex;justify-content:space-between;
     align-items:flex-start;gap:16px}
   .caption-title{font-family:Georgia,serif;font-size:24px;line-height:1.15;
@@ -90,11 +108,6 @@
     max-width:62ch;white-space:pre-wrap}
   .caption-meta{font-size:11px;color:var(--muted);letter-spacing:.12em;
     text-transform:uppercase;margin-top:12px}
-
-  .dots{margin-top:18px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .dot{height:2px;width:24px;background:var(--line-strong);border-radius:999px;
-    transition:all .35s cubic-bezier(.16,1,.3,1);cursor:pointer;border:none;padding:0}
-  .dot.active{background:var(--ink);width:40px}
 
   /* Comments */
   .comments{margin-top:32px;border-top:1px solid var(--line);padding-top:24px}
@@ -112,8 +125,7 @@
   .comment-author{font-weight:600;font-size:13px}
   .comment-time{font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
   .comment-body{font-size:13px;line-height:1.55;color:#3A3A38;white-space:pre-wrap}
-  .comment-empty{font-size:12px;color:var(--muted);font-style:italic;
-    padding:14px 0 18px}
+  .comment-empty{font-size:12px;color:var(--muted);font-style:italic;padding:14px 0 18px}
   .comment-form{display:flex;flex-direction:column;gap:10px;border:1px solid var(--line);
     background:var(--surface);border-radius:12px;padding:16px}
   .comment-form input,.comment-form textarea{border:1px solid var(--line-strong);
@@ -127,7 +139,7 @@
   .comment-status.err{color:#B42318}
   .comment-status.ok{color:#111}
 
-  /* Thumbs (edit only) */
+  /* Edit-mode strip with inline editing */
   .thumbs{margin-top:32px;border-top:1px solid var(--line);padding-top:20px}
   .thumbs-head{display:flex;justify-content:space-between;align-items:center;
     margin-bottom:14px;gap:12px;flex-wrap:wrap}
@@ -159,12 +171,10 @@
 
   .empty-state{text-align:center;padding:40px}
   .empty-state .big{font-family:Georgia,serif;font-size:26px;margin-bottom:8px}
-  .empty-state .sub{color:var(--muted);font-size:12px;letter-spacing:.12em;
-    text-transform:uppercase}
+  .empty-state .sub{color:var(--muted);font-size:12px;letter-spacing:.12em;text-transform:uppercase}
 
   .modal-backdrop{position:fixed;inset:0;background:rgba(14,14,14,.38);
     backdrop-filter:blur(8px);z-index:60;display:grid;place-items:center;padding:20px}
-  .modal-backdrop[hidden]{display:none}
   .modal{background:var(--surface);border-radius:20px;border:1px solid var(--line);
     max-width:440px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.12)}
   .modal h3{margin:0 0 6px;font-family:Georgia,serif;font-weight:400;font-size:22px}
@@ -217,6 +227,7 @@
             <div class="field">
               <label for="studyTitle">Study title</label>
               <input id="studyTitle" placeholder="Mirror Charger Concepts">
+              <span class="comment-status" id="studyTitleStatus" style="margin-top:6px"></span>
             </div>
           </div>
         </div>
@@ -226,6 +237,12 @@
     <!-- VIEWER -->
     <div class="viewer-wrap">
       <div class="viewer empty" id="viewer"></div>
+    </div>
+
+    <!-- CONCEPT STRIP — visible to everyone -->
+    <div id="conceptStripWrap" hidden>
+      <div class="strip-caption">All concepts</div>
+      <div class="concept-strip" id="conceptStrip"></div>
     </div>
 
     <div class="caption-bar" id="captionBar" hidden>
@@ -252,8 +269,6 @@
       </div>
     </div>
 
-    <div class="dots" id="dots" hidden></div>
-
     <!-- COMMENTS -->
     <div class="comments" id="commentsBlock" hidden>
       <div class="comments-head">
@@ -272,12 +287,12 @@
       </form>
     </div>
 
-    <!-- THUMBS (edit mode only) -->
+    <!-- EDIT THUMBS (owner only, inline editing) -->
     <div class="thumbs" id="thumbs" hidden>
       <div class="thumbs-head">
-        <h3 id="thumbsHead">Order</h3>
+        <h3 id="thumbsHead">Edit concepts</h3>
         <span style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">
-          Drag or use ← → to reorder • changes save instantly
+          Drag or use ← → to reorder • title &amp; description auto-save
         </span>
       </div>
       <div class="thumb-strip" id="thumbStrip"></div>
@@ -316,7 +331,7 @@ const CONFIG = {
   supabaseUrl: 'https://pujiyowznbgpttfjtngo.supabase.co',
   supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB1aml5b3d6bmJncHR0Zmp0bmdvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE0ODYyMzEsImV4cCI6MjEwNzA2MjIzMX0.z0VFfymTMrYd_3qTSNvom2GVRU-2aPenMeVW96h3eqM',
   studyTitle: 'Mirror Charger Concepts',
-  maxImageDimension: 2000,   // images are resized to this before upload
+  maxImageDimension: 2000,
   jpegQuality: 0.88,
 };
 /* ================================================================== */
@@ -334,7 +349,8 @@ const state = {
   edit: false,
   user: null,
   dragId: null,
-  comments: {},           // { [conceptId]: [...] }
+  comments: {},          // { [conceptId]: [...] }  — for the currently viewed concept
+  commentCounts: {},     // { [conceptId]: n }      — for the strip badges
   loadingComments: false,
 };
 
@@ -368,15 +384,12 @@ async function initAuth() {
   sb.auth.onAuthStateChange((_evt, session) => {
     state.user = session?.user || null;
     if (state.user) {
-      // just signed in — close modal, show edit
       $('#signinModal').hidden = true;
       $('#signinStatus').textContent = '';
-      if (state.edit) renderAll();
     } else {
       state.edit = false;
-      renderAll();
     }
-    renderTopbar();
+    renderAll();
   });
 }
 
@@ -394,7 +407,26 @@ async function signOut() {
   renderAll();
 }
 
-/* ---------- load / write concepts ---------- */
+/* ---------- settings ---------- */
+async function loadSettings() {
+  try {
+    const { data, error } = await sb.from('settings').select('key, value');
+    if (error) throw error;
+    for (const row of data || []) {
+      if (row.key === 'study_title' && row.value) state.title = row.value;
+    }
+  } catch (e) {
+    console.warn('[settings] load failed:', e.message);
+  }
+}
+
+async function saveStudyTitle(value) {
+  const { error } = await sb.from('settings')
+    .upsert({ key: 'study_title', value }, { onConflict: 'key' });
+  if (error) throw error;
+}
+
+/* ---------- concepts ---------- */
 async function loadConcepts() {
   const { data, error } = await sb.from('concepts')
     .select('*')
@@ -415,6 +447,20 @@ async function loadConcepts() {
     src: sb.storage.from('concepts').getPublicUrl(r.image_path).data.publicUrl,
     sort_order: r.sort_order,
   }));
+}
+
+async function loadCommentCounts() {
+  try {
+    const { data, error } = await sb.from('comments').select('concept_id');
+    if (error) throw error;
+    const counts = {};
+    for (const row of data || []) {
+      counts[row.concept_id] = (counts[row.concept_id] || 0) + 1;
+    }
+    state.commentCounts = counts;
+  } catch (e) {
+    console.warn('[counts]', e.message);
+  }
 }
 
 async function resizeImage(file) {
@@ -447,9 +493,7 @@ async function uploadFiles(fileList) {
   const files = [...fileList].filter(f => f.type.startsWith('image/'));
   if (!files.length) return;
 
-  const status = $('#metaFiles');
-  status.textContent = `Uploading ${files.length}…`;
-
+  $('#metaFiles').textContent = `Uploading ${files.length}…`;
   let order = state.items.length ? Math.max(...state.items.map(x => x.sort_order)) + 1 : 0;
   let ok = 0;
 
@@ -481,11 +525,12 @@ async function uploadFiles(fileList) {
 
   await loadConcepts();
   if (ok && state.items.length) {
-    // jump to the first newly added
     state.cur = state.items.length - ok;
     if (state.cur < 0) state.cur = 0;
   }
   renderAll();
+  const it = state.items[state.cur];
+  if (it) loadComments(it.id);
   toast(ok === files.length ? `Uploaded ${ok}` : `Uploaded ${ok} of ${files.length} — see console`);
 }
 
@@ -508,21 +553,22 @@ async function deleteConcept(id) {
   if (!it) return;
   if (!confirm('Delete this concept and all its comments?')) return;
 
-  try {
-    await sb.storage.from('concepts').remove([it.image_path]);
-  } catch (e) { console.warn('[storage delete]', e); }
+  try { await sb.storage.from('concepts').remove([it.image_path]); }
+  catch (e) { console.warn('[storage delete]', e); }
 
   const { error } = await sb.from('concepts').delete().eq('id', id);
   if (error) { toast('Delete failed'); return; }
 
   await loadConcepts();
+  await loadCommentCounts();
   state.cur = Math.min(state.cur, Math.max(0, state.items.length - 1));
   renderAll();
+  const next = state.items[state.cur];
+  if (next) loadComments(next.id);
   toast('Deleted');
 }
 
 async function persistOrder() {
-  // update each row's sort_order to its current index
   const updates = state.items.map((it, i) =>
     sb.from('concepts').update({ sort_order: i }).eq('id', it.id));
   await Promise.all(updates);
@@ -538,7 +584,7 @@ async function reorder(fromId, toId) {
   arr.splice(to, 0, it);
   state.items = arr;
   state.cur = to;
-  renderViewer(); renderThumbs(); renderComments();
+  renderViewer(); renderStrip(); renderThumbs(); renderComments();
   await persistOrder();
 }
 
@@ -551,7 +597,7 @@ async function moveItem(id, delta) {
   arr.splice(j, 0, it);
   state.items = arr;
   state.cur = j;
-  renderViewer(); renderThumbs(); renderComments();
+  renderViewer(); renderStrip(); renderThumbs(); renderComments();
   await persistOrder();
 }
 
@@ -578,6 +624,8 @@ async function postComment(conceptId, author, body) {
   });
   if (error) throw error;
   await loadComments(conceptId);
+  await loadCommentCounts();
+  renderStrip();
 }
 
 async function deleteComment(id, conceptId) {
@@ -585,6 +633,8 @@ async function deleteComment(id, conceptId) {
   const { error } = await sb.from('comments').delete().eq('id', id);
   if (error) { toast('Delete failed'); return; }
   await loadComments(conceptId);
+  await loadCommentCounts();
+  renderStrip();
 }
 
 /* ---------- rendering ---------- */
@@ -592,13 +642,7 @@ function renderTopbar() {
   $('#brandTitle').textContent = state.title.split('—')[0].trim() || 'CONCEPT';
   $('#brandMode').textContent = state.user ? 'owner' : 'review';
   $('#countPill').textContent = `${state.items.length} concept${state.items.length === 1 ? '' : 's'}`;
-
-  const btn = $('#authBtn');
-  if (state.user) {
-    btn.textContent = 'Sign out';
-  } else {
-    btn.textContent = 'Sign in';
-  }
+  $('#authBtn').textContent = state.user ? 'Sign out' : 'Sign in';
   document.title = state.title || 'Concept Viewer';
 }
 
@@ -614,7 +658,7 @@ function renderViewer() {
     </div>`;
     $('#captionBar').hidden = true;
     $('#descEditor').hidden = true;
-    $('#dots').hidden = true;
+    $('#conceptStripWrap').hidden = true;
     $('#commentsBlock').hidden = true;
     return;
   }
@@ -643,7 +687,6 @@ function renderViewer() {
   $('#captionMeta').textContent = state.title;
   $('#deleteBtn').hidden = !state.user;
 
-  // description editor (edit mode only)
   const de = $('#descEditor');
   if (state.user) {
     de.hidden = false;
@@ -652,12 +695,23 @@ function renderViewer() {
   } else {
     de.hidden = true;
   }
+}
 
-  const dots = $('#dots');
-  dots.hidden = n <= 1;
-  dots.innerHTML = state.items.map((_, i) =>
-    `<button class="dot ${i === state.cur ? 'active' : ''}" data-dot="${i}"
-             aria-label="Go to ${i + 1}"></button>`).join('');
+function renderStrip() {
+  const wrap = $('#conceptStripWrap');
+  const strip = $('#conceptStrip');
+  if (!state.items.length) { wrap.hidden = true; strip.innerHTML = ''; return; }
+  wrap.hidden = false;
+
+  strip.innerHTML = state.items.map((it, i) => {
+    const count = state.commentCounts[it.id] || 0;
+    return `<button class="strip-tile ${i === state.cur ? 'active' : ''}" data-strip="${i}"
+                    aria-label="Concept ${i+1}: ${esc(it.title)}" title="${esc(it.title)}">
+      <img src="${esc(it.src)}" alt="" draggable="false">
+      <span class="strip-num">${String(i+1).padStart(2,'0')}</span>
+      ${count ? `<span class="strip-badge">+${count}</span>` : ''}
+    </button>`;
+  }).join('');
 }
 
 function renderComments() {
@@ -669,7 +723,8 @@ function renderComments() {
   const it = state.items[state.cur];
   const list = state.comments[it.id];
   const count = list ? list.length : 0;
-  $('#commentCount').textContent = state.loadingComments ? 'Loading…'
+  $('#commentCount').textContent = state.loadingComments
+    ? 'Loading…'
     : `${count} comment${count === 1 ? '' : 's'}`;
 
   const wrap = $('#commentList');
@@ -695,7 +750,7 @@ function renderThumbs() {
   const wrap = $('#thumbs');
   if (!state.user || !state.items.length) { wrap.hidden = true; return; }
   wrap.hidden = false;
-  $('#thumbsHead').textContent = `Order — ${state.items.length} concepts`;
+  $('#thumbsHead').textContent = `Edit concepts — ${state.items.length}`;
 
   $('#thumbStrip').innerHTML = state.items.map((it, i) => `
     <div class="thumb ${i === state.cur ? 'active' : ''}" data-id="${esc(it.id)}" draggable="true">
@@ -725,6 +780,7 @@ function renderEditBlock() {
 function renderAll() {
   renderTopbar();
   renderViewer();
+  renderStrip();
   renderComments();
   renderThumbs();
   renderEditBlock();
@@ -733,27 +789,22 @@ function renderAll() {
 /* ---------- navigation ---------- */
 function go(delta) {
   state.cur = Math.max(0, Math.min(state.cur + delta, state.items.length - 1));
-  renderViewer(); renderThumbs(); renderComments();
+  renderViewer(); renderStrip(); renderComments();
   const it = state.items[state.cur];
   if (it) loadComments(it.id);
 }
 function goto(i) {
   state.cur = Math.max(0, Math.min(i, state.items.length - 1));
-  renderViewer(); renderThumbs(); renderComments();
+  renderViewer(); renderStrip(); renderComments();
   const it = state.items[state.cur];
   if (it) loadComments(it.id);
 }
 
 /* ---------- wire ---------- */
 function wire() {
-  // auth
   $('#authBtn').addEventListener('click', async () => {
-    if (state.user) {
-      if (confirm('Sign out?')) await signOut();
-    } else {
-      $('#signinModal').hidden = false;
-      $('#signinEmail').focus();
-    }
+    if (state.user) { if (confirm('Sign out?')) await signOut(); }
+    else { $('#signinModal').hidden = false; $('#signinEmail').focus(); }
   });
 
   $('#signinSend').addEventListener('click', async () => {
@@ -774,10 +825,25 @@ function wire() {
     bd.addEventListener('click', (e) => { if (e.target === bd) bd.hidden = true; });
   });
 
-  // study title
-  $('#studyTitle').addEventListener('change', (e) => {
+  // study title (persisted)
+  const titleInput = $('#studyTitle');
+  let titleSaveTimer;
+  titleInput.addEventListener('input', (e) => {
     state.title = e.target.value || CONFIG.studyTitle;
     renderTopbar();
+  });
+  titleInput.addEventListener('change', async (e) => {
+    const val = e.target.value.trim() || CONFIG.studyTitle;
+    clearTimeout(titleSaveTimer);
+    $('#studyTitleStatus').textContent = 'Saving…';
+    try {
+      await saveStudyTitle(val);
+      $('#studyTitleStatus').textContent = '✓ Saved';
+      setTimeout(() => { $('#studyTitleStatus').textContent = ''; }, 1500);
+    } catch (err) {
+      console.error(err);
+      $('#studyTitleStatus').textContent = 'Save failed';
+    }
   });
 
   // upload
@@ -788,7 +854,6 @@ function wire() {
     if (e.target.files) uploadFiles(e.target.files);
     e.target.value = '';
   });
-
   let depth = 0;
   uploader.addEventListener('dragenter', (e) => {
     e.preventDefault(); depth++; uploader.classList.add('drag');
@@ -807,9 +872,11 @@ function wire() {
     const b = e.target.closest('[data-nav]');
     if (b) go(parseInt(b.dataset.nav, 10));
   });
-  $('#dots').addEventListener('click', (e) => {
-    const d = e.target.closest('[data-dot]');
-    if (d) goto(parseInt(d.dataset.dot, 10));
+
+  // concept strip (public preview)
+  $('#conceptStrip').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-strip]');
+    if (b) goto(parseInt(b.dataset.strip, 10));
   });
 
   // delete concept
@@ -834,7 +901,6 @@ function wire() {
       $('#descStatus').textContent = 'Save failed';
     }
   });
-  // auto-save on blur too
   $('#descInput').addEventListener('blur', async () => {
     const it = state.items[state.cur];
     if (!it) return;
@@ -868,7 +934,6 @@ function wire() {
     }
   });
 
-  // delete comment (delegated)
   $('#commentList').addEventListener('click', (e) => {
     const b = e.target.closest('[data-delcomment]');
     if (!b) return;
@@ -876,7 +941,7 @@ function wire() {
     if (it) deleteComment(b.dataset.delcomment, it.id);
   });
 
-  // thumbs
+  // edit thumbs strip
   const strip = $('#thumbStrip');
   strip.addEventListener('input', (e) => {
     const rin = e.target.closest('[data-rename]');
@@ -894,7 +959,7 @@ function wire() {
   strip.addEventListener('change', async (e) => {
     const rin = e.target.closest('[data-rename]');
     if (rin) {
-      try { await saveTitle(rin.dataset.rename, rin.value); renderViewer(); renderComments(); }
+      try { await saveTitle(rin.dataset.rename, rin.value); renderViewer(); renderStrip(); }
       catch (err) { console.error(err); toast('Save failed'); }
       return;
     }
@@ -969,9 +1034,8 @@ function wire() {
 
   wire();
   await initAuth();
-  renderAll();
 
-  await loadConcepts();
+  await Promise.all([loadSettings(), loadConcepts(), loadCommentCounts()]);
   renderAll();
 
   const it = state.items[state.cur];
