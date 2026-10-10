@@ -79,6 +79,9 @@
     border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.92);
     backdrop-filter:blur(10px);display:grid;place-items:center;cursor:pointer;
     transition:all .2s;z-index:4;font-size:18px;line-height:1}
+  @media (max-width: 700px) {
+  .nav-btn { display: none }
+}
   .nav-btn:hover{background:#fff;border-color:var(--ink)}
   .nav-btn:disabled{opacity:.3;pointer-events:none}
   .nav-btn.left{left:14px} .nav-btn.right{right:14px}
