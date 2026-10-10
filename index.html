@@ -677,7 +677,7 @@ function renderViewer() {
       <div class="sub">${state.user ? 'Use the uploader above' : 'Check back soon'}</div>
     </div>`;
     $('#captionBar').hidden = true;
-    $('#descEditor').hidden = true;
+    $('#metaEditor').hidden = true;
     $('#conceptStripWrap').hidden = true;
     $('#commentsBlock').hidden = true;
     return;
@@ -715,6 +715,7 @@ if (state.user) {
   $('#metaStatus').textContent = '';
 } else {
   de.hidden = true;
+}
 }
 
 function renderStrip() {
