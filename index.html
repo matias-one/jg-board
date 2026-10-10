@@ -257,18 +257,23 @@
       </div>
     </div>
 
-    <!-- Description editor (edit mode only) -->
-    <div id="descEditor" hidden style="margin-top:16px">
-      <div class="field">
-        <label for="descInput">Description for this concept</label>
-        <textarea id="descInput" rows="3" spellcheck="true"
-          placeholder="What works, what to notice, what you're asking for feedback on…"></textarea>
-      </div>
-      <div style="display:flex;gap:10px;margin-top:10px;align-items:center">
-        <button class="btn small" id="descSave">Save description</button>
-        <span class="comment-status" id="descStatus"></span>
-      </div>
-    </div>
+<!-- Title + description editor (edit mode only) -->
+<div id="metaEditor" hidden style="margin-top:16px">
+  <div class="field">
+    <label for="metaTitleInput">Title for this concept</label>
+    <input id="metaTitleInput" type="text" spellcheck="true"
+      placeholder="e.g. Studio Light — Concept 01">
+  </div>
+  <div class="field" style="margin-top:12px">
+    <label for="descInput">Description for this concept</label>
+    <textarea id="descInput" rows="3" spellcheck="true"
+      placeholder="What works, what to notice, what you're asking for feedback on…"></textarea>
+  </div>
+  <div style="display:flex;gap:10px;margin-top:10px;align-items:center">
+    <button class="btn small" id="metaSave">Save</button>
+    <span class="comment-status" id="metaStatus"></span>
+  </div>
+</div>
 
     <!-- COMMENTS -->
     <div class="comments" id="commentsBlock" hidden>
@@ -688,14 +693,14 @@ function renderViewer() {
   $('#captionMeta').textContent = state.title;
   $('#deleteBtn').hidden = !state.user;
 
-  const de = $('#descEditor');
-  if (state.user) {
-    de.hidden = false;
-    $('#descInput').value = it.description || '';
-    $('#descStatus').textContent = '';
-  } else {
-    de.hidden = true;
-  }
+const de = $('#metaEditor');
+if (state.user) {
+  de.hidden = false;
+  $('#metaTitleInput').value = it.title || '';
+  $('#descInput').value = it.description || '';
+  $('#metaStatus').textContent = '';
+} else {
+  de.hidden = true;
 }
 
 function renderStrip() {
@@ -886,30 +891,42 @@ function wire() {
     if (it) deleteConcept(it.id);
   });
 
-  // description editor
-  $('#descSave').addEventListener('click', async () => {
-    const it = state.items[state.cur];
-    if (!it) return;
-    const val = $('#descInput').value;
-    $('#descStatus').textContent = 'Saving…';
-    try {
-      await saveDescription(it.id, val);
-      $('#descStatus').textContent = '✓ Saved';
-      renderViewer(); renderThumbs();
-      setTimeout(() => { $('#descStatus').textContent = ''; }, 1500);
-    } catch (e) {
-      console.error(e);
-      $('#descStatus').textContent = 'Save failed';
-    }
-  });
-  $('#descInput').addEventListener('blur', async () => {
-    const it = state.items[state.cur];
-    if (!it) return;
-    const val = $('#descInput').value;
-    if (val === (it.description || '')) return;
-    try { await saveDescription(it.id, val); renderViewer(); renderThumbs(); }
-    catch (e) { console.error(e); }
-  });
+// meta editor — title + description
+$('#metaSave').addEventListener('click', async () => {
+  const it = state.items[state.cur];
+  if (!it) return;
+  const newTitle = $('#metaTitleInput').value.trim() || 'Untitled';
+  const newDesc = $('#descInput').value;
+  $('#metaStatus').textContent = 'Saving…';
+  try {
+    if (newTitle !== it.title) await saveTitle(it.id, newTitle);
+    if (newDesc !== it.description) await saveDescription(it.id, newDesc);
+    $('#metaStatus').textContent = '✓ Saved';
+    renderViewer(); renderStrip(); renderThumbs();
+    setTimeout(() => { $('#metaStatus').textContent = ''; }, 1500);
+  } catch (e) {
+    console.error(e);
+    $('#metaStatus').textContent = 'Save failed';
+  }
+});
+
+$('#metaTitleInput').addEventListener('blur', async () => {
+  const it = state.items[state.cur];
+  if (!it) return;
+  const val = $('#metaTitleInput').value.trim() || 'Untitled';
+  if (val === it.title) return;
+  try { await saveTitle(it.id, val); renderViewer(); renderStrip(); renderThumbs(); }
+  catch (e) { console.error(e); }
+});
+
+$('#descInput').addEventListener('blur', async () => {
+  const it = state.items[state.cur];
+  if (!it) return;
+  const val = $('#descInput').value;
+  if (val === (it.description || '')) return;
+  try { await saveDescription(it.id, val); renderViewer(); renderThumbs(); }
+  catch (e) { console.error(e); }
+});
 
   // comment form
   $('#commentForm').addEventListener('submit', async (e) => {
