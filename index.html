@@ -190,6 +190,13 @@
     background:#111;color:#fff;padding:10px 18px;border-radius:999px;font-size:12px;
     letter-spacing:.06em;opacity:0;pointer-events:none;transition:all .3s;z-index:80}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .lightbox{position:fixed;inset:0;z-index:100;background:rgba(10,10,10,.94);
+  display:flex;align-items:center;justify-content:center;cursor:zoom-out;
+  padding:24px;animation:lbIn .18s ease}
+@keyframes lbIn{from{opacity:0}to{opacity:1}}
+.lightbox img{max-width:100%;max-height:100%;width:auto;height:auto;
+  object-fit:contain;user-select:none;border-radius:4px}
+@media(max-width:700px){.lightbox{padding:8px}}
 </style>
 </head>
 <body>
@@ -328,6 +335,9 @@
 
 </div>
 
+  <div class="lightbox" id="lightbox" hidden>
+  <img id="lightboxImg" alt="">
+</div>
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -358,9 +368,10 @@ const state = {
   edit: false,
   user: null,
   dragId: null,
-  comments: {},          // { [conceptId]: [...] }  — for the currently viewed concept
-  commentCounts: {},     // { [conceptId]: n }      — for the strip badges
+  comments: {},
+  commentCounts: {},
   loadingComments: false,
+  didSwipe: false,        // ← add this line
 };
 
 const uid = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
@@ -808,6 +819,16 @@ function goto(i) {
   const it = state.items[state.cur];
   if (it) loadComments(it.id);
 }
+  
+  function openLightbox() {
+  const it = state.items[state.cur];
+  if (!it) return;
+  const lb = $('#lightbox');
+  const img = $('#lightboxImg');
+  img.src = it.src;
+  img.alt = it.title || '';
+  lb.hidden = false;
+}
 
 /* ---------- wire ---------- */
 function wire() {
@@ -876,11 +897,16 @@ function wire() {
     if (e.dataTransfer?.files?.length) uploadFiles(e.dataTransfer.files);
   });
 
-  // viewer nav
-  $('#viewer').addEventListener('click', (e) => {
-    const b = e.target.closest('[data-nav]');
-    if (b) go(parseInt(b.dataset.nav, 10));
-  });
+// viewer nav + lightbox open
+$('#viewer').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-nav]');
+  if (b) { go(parseInt(b.dataset.nav, 10)); return; }
+  if (state.didSwipe) return;
+  if (e.target.closest('img')) openLightbox();
+});
+
+// lightbox close
+$('#lightbox').addEventListener('click', () => { $('#lightbox').hidden = true; });
 
   // concept strip (public preview)
   $('#conceptStrip').addEventListener('click', (e) => {
@@ -1021,16 +1047,23 @@ $('#descInput').addEventListener('blur', async () => {
     state.dragId = null;
   });
 
-  // swipe
-  const viewer = $('#viewer');
-  let sx = null;
-  viewer.addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; }, { passive: true });
-  viewer.addEventListener('touchend', (e) => {
-    if (sx === null) return;
-    const dx = e.changedTouches[0].clientX - sx;
-    if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1);
-    sx = null;
-  });
+// swipe
+const viewer = $('#viewer');
+let sx = null;
+viewer.addEventListener('touchstart', (e) => {
+  sx = e.touches[0].clientX;
+  state.didSwipe = false;
+}, { passive: true });
+viewer.addEventListener('touchend', (e) => {
+  if (sx === null) return;
+  const dx = e.changedTouches[0].clientX - sx;
+  if (Math.abs(dx) > 50) {
+    state.didSwipe = true;
+    go(dx < 0 ? 1 : -1);
+    setTimeout(() => { state.didSwipe = false; }, 500);
+  }
+  sx = null;
+});
 
   // keyboard
   window.addEventListener('keydown', (e) => {
@@ -1039,7 +1072,10 @@ $('#descInput').addEventListener('blur', async () => {
     if (e.metaKey || e.ctrlKey || e.altKey) return;
     if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
     if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
-    if (e.key === 'Escape') $('#signinModal').hidden = true;
+    if (e.key === 'Escape') {
+  $('#signinModal').hidden = true;
+  $('#lightbox').hidden = true;
+}
   });
 }
 
