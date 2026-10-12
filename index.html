@@ -190,6 +190,65 @@
     background:#111;color:#fff;padding:10px 18px;border-radius:999px;font-size:12px;
     letter-spacing:.06em;opacity:0;pointer-events:none;transition:all .3s;z-index:80}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* Rich description editor */
+.rich-wrap{border:1px solid var(--line-strong);border-radius:10px;background:var(--surface);
+  transition:border .2s;overflow:hidden}
+.rich-wrap:focus-within{border-color:var(--ink)}
+.rich-toolbar{display:flex;align-items:center;gap:4px;padding:6px 8px;
+  border-bottom:1px solid var(--line);background:#FBFAF8;flex-wrap:wrap}
+.rt-btn{appearance:none;background:transparent;border:1px solid transparent;border-radius:6px;
+  min-width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--ink);font-size:13px;line-height:1;transition:all .12s;padding:0 6px}
+.rt-btn:hover{background:#F0EDE8;border-color:var(--line-strong)}
+.rt-btn.active{background:#EAE7E1;border-color:var(--line-strong)}
+.rt-sep{width:1px;height:18px;background:var(--line);margin:0 2px}
+.rt-select{appearance:none;background:transparent;border:1px solid transparent;
+  border-radius:6px;height:30px;font-size:12px;padding:0 22px 0 8px;cursor:pointer;
+  color:var(--ink);font-family:inherit;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='6' viewBox='0 0 8 6'><path d='M1 1l3 3 3-3' fill='none' stroke='%23888' stroke-width='1.2' stroke-linecap='round'/></svg>");
+  background-repeat:no-repeat;background-position:right 6px center}
+.rt-select:hover{background-color:#F0EDE8}
+.rich-editor{min-height:90px;padding:12px 14px;font-size:14px;line-height:1.6;
+  color:var(--ink);outline:none;word-wrap:break-word;overflow-wrap:break-word}
+.rich-editor.is-empty::before{content:attr(data-placeholder);color:var(--muted);
+  pointer-events:none}
+.rich-editor h2,.rich-editor h3{font-family:Georgia,serif;font-weight:400;
+  margin:.6em 0 .3em;letter-spacing:-.01em}
+.rich-editor h2{font-size:1.25em}
+.rich-editor h3{font-size:1.1em}
+.rich-editor p,.rich-editor div{margin:0 0 .7em}
+.rich-editor ul,.rich-editor ol{margin:.3em 0 .8em;padding-left:1.4em}
+.rich-editor ul{list-style:disc}
+.rich-editor ol{list-style:decimal}
+.rich-editor li{margin:.15em 0}
+.rich-editor blockquote{border-left:3px solid var(--line-strong);
+  padding:0 0 0 12px;margin:.5em 0;color:#555}
+.rich-editor code{font-family:ui-monospace,Menlo,monospace;font-size:.9em;
+  background:#F0EDE8;padding:1px 5px;border-radius:4px}
+.rich-editor pre{background:#F0EDE8;padding:10px 12px;border-radius:8px;
+  overflow-x:auto;font-size:.9em;margin:.4em 0}
+.rich-editor a{color:var(--ink);text-decoration:underline}
+
+/* Rich rendering in the caption */
+.caption-desc p,.caption-desc div{margin:0 0 .7em}
+.caption-desc p:last-child,.caption-desc div:last-child{margin-bottom:0}
+.caption-desc ul,.caption-desc ol{margin:.3em 0 .8em;padding-left:1.4em}
+.caption-desc ul{list-style:disc}
+.caption-desc ol{list-style:decimal}
+.caption-desc li{margin:.15em 0}
+.caption-desc blockquote{border-left:3px solid var(--line-strong);
+  padding:0 0 0 12px;margin:.5em 0;color:#555}
+.caption-desc h2,.caption-desc h3{font-family:Georgia,serif;font-weight:400;
+  margin:.5em 0 .3em;letter-spacing:-.01em}
+.caption-desc h2{font-size:1.2em}
+.caption-desc h3{font-size:1.05em}
+.caption-desc code{font-family:ui-monospace,Menlo,monospace;font-size:.9em;
+  background:#F0EDE8;padding:1px 5px;border-radius:4px}
+.caption-desc pre{background:#F0EDE8;padding:10px 12px;border-radius:8px;
+  overflow-x:auto;font-size:.9em;margin:.4em 0}
+.caption-desc a{color:var(--ink);text-decoration:underline}
+  
   .lightbox{position:fixed;inset:0;z-index:100;background:rgba(10,10,10,.94);
   display:flex;align-items:center;justify-content:center;cursor:zoom-out;
   padding:24px;animation:lbIn .18s ease}
@@ -275,9 +334,32 @@
       placeholder="e.g. Studio Light — Concept 01">
   </div>
   <div class="field" style="margin-top:12px">
-    <label for="descInput">Description for this concept</label>
-    <textarea id="descInput" rows="3" spellcheck="true"
-      placeholder="What works, what to notice, what you're asking for feedback on…"></textarea>
+    <label>Description for this concept</label>
+    <div class="rich-wrap">
+      <div class="rich-toolbar" id="metaToolbar">
+        <select class="rt-select" id="rtFormat" title="Text style">
+          <option value="p">Normal</option>
+          <option value="h2">Heading</option>
+          <option value="h3">Subheading</option>
+          <option value="blockquote">Quote</option>
+          <option value="pre">Code</option>
+        </select>
+        <span class="rt-sep"></span>
+        <button type="button" class="rt-btn" data-cmd="bold" title="Bold"><b>B</b></button>
+        <button type="button" class="rt-btn" data-cmd="italic" title="Italic"><i>I</i></button>
+        <button type="button" class="rt-btn" data-cmd="underline" title="Underline"><u>U</u></button>
+        <button type="button" class="rt-btn" data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button>
+        <span class="rt-sep"></span>
+        <button type="button" class="rt-btn" data-cmd="insertUnorderedList" title="Bulleted list">•</button>
+        <button type="button" class="rt-btn" data-cmd="insertOrderedList" title="Numbered list">1.</button>
+        <span class="rt-sep"></span>
+        <button type="button" class="rt-btn" id="rtLink" title="Insert link">🔗</button>
+        <button type="button" class="rt-btn" data-cmd="removeFormat" title="Clear formatting">⌫</button>
+      </div>
+      <div class="rich-editor" id="descInput" contenteditable="true"
+        spellcheck="true"
+        data-placeholder="What works, what to notice, what you're asking for feedback on…"></div>
+    </div>
   </div>
   <div style="display:flex;gap:10px;margin-top:10px;align-items:center">
     <button class="btn small" id="metaSave">Save</button>
@@ -463,6 +545,7 @@ async function loadConcepts() {
     id: r.id,
     title: r.title || 'Untitled',
     description: r.description || '',
+    description_html: r.description_html || '',
     image_path: r.image_path,
     src: sb.storage.from('concepts').getPublicUrl(r.image_path).data.publicUrl,
     sort_order: r.sort_order,
@@ -554,11 +637,13 @@ async function uploadFiles(fileList) {
   toast(ok === files.length ? `Uploaded ${ok}` : `Uploaded ${ok} of ${files.length} — see console`);
 }
 
-async function saveDescription(id, description) {
-  const { error } = await sb.from('concepts').update({ description }).eq('id', id);
+async function saveDescription(id, plain, html) {
+  const { error } = await sb.from('concepts')
+    .update({ description: plain, description_html: html || null })
+    .eq('id', id);
   if (error) throw error;
   const it = state.items.find(x => x.id === id);
-  if (it) it.description = description;
+  if (it) { it.description = plain; it.description_html = html || ''; }
 }
 
 async function saveTitle(id, title) {
@@ -697,8 +782,15 @@ function renderViewer() {
   $('#captionTitle').textContent = it.title || 'Untitled';
 
   const desc = $('#captionDesc');
-  if (it.description && it.description.trim()) {
+  const richHtml = it.description_html && it.description_html.trim()
+    ? sanitizeHTML(it.description_html) : '';
+  if (richHtml) {
+    desc.innerHTML = richHtml;
+    desc.style.whiteSpace = 'normal';
+    desc.hidden = false;
+  } else if (it.description && it.description.trim()) {
     desc.textContent = it.description;
+    desc.style.whiteSpace = 'pre-wrap';
     desc.hidden = false;
   } else {
     desc.textContent = '';
@@ -711,11 +803,61 @@ const de = $('#metaEditor');
 if (state.user) {
   de.hidden = false;
   $('#metaTitleInput').value = it.title || '';
-  $('#descInput').value = it.description || '';
+  const ed = $('#descInput');
+  ed.innerHTML = richHtml || (it.description ? esc(it.description) : '');
+  ed.classList.toggle('is-empty', !ed.textContent.trim());
   $('#metaStatus').textContent = '';
 } else {
   de.hidden = true;
 }
+}
+
+  const RICH_ALLOWED = new Set([
+  'P','DIV','BR','STRONG','B','EM','I','U','S','STRIKE','DEL',
+  'UL','OL','LI','BLOCKQUOTE','H1','H2','H3','H4','CODE','PRE','A'
+]);
+
+function sanitizeHTML(dirty) {
+  if (!dirty) return '';
+  const doc = new DOMParser().parseFromString('<div>' + dirty + '</div>', 'text/html');
+  const root = doc.body.firstChild;
+
+  const clean = (node) => {
+    for (const child of [...node.childNodes]) {
+      if (child.nodeType === 3) continue;
+      if (child.nodeType !== 1) { node.removeChild(child); continue; }
+
+      const tag = child.tagName.toUpperCase();
+      if (!RICH_ALLOWED.has(tag)) {
+        while (child.firstChild) node.insertBefore(child.firstChild, child);
+        node.removeChild(child);
+        continue;
+      }
+
+      for (const attr of [...child.attributes]) {
+        const name = attr.name.toLowerCase();
+        if (tag === 'A' && name === 'href') {
+          const v = attr.value.trim();
+          if (!/^(https?:|mailto:|tel:|\/|#)/i.test(v)) {
+            child.removeAttribute(attr.name);
+          }
+          continue;
+        }
+        if (tag === 'A' && (name === 'target' || name === 'rel')) continue;
+        child.removeAttribute(attr.name);
+      }
+
+      if (tag === 'A' && child.getAttribute('href')) {
+        child.setAttribute('target', '_blank');
+        child.setAttribute('rel', 'noopener noreferrer');
+      }
+
+      clean(child);
+    }
+  };
+
+  clean(root);
+  return root.innerHTML;
 }
 
 function renderStrip() {
@@ -781,7 +923,6 @@ function renderThumbs() {
       </div>
       <div class="thumb-body">
         <input value="${esc(it.title)}" data-rename="${esc(it.id)}" spellcheck="false" placeholder="Title">
-        <textarea data-desc="${esc(it.id)}" spellcheck="false" placeholder="Description…">${esc(it.description || '')}</textarea>
         <div class="thumb-actions">
           <button class="icon-btn" data-move="-1" title="Move left"  ${i === 0 ? 'disabled' : ''}>←</button>
           <button class="icon-btn" data-move="1"  title="Move right" ${i === state.items.length - 1 ? 'disabled' : ''}>→</button>
@@ -922,22 +1063,39 @@ $('#lightbox').addEventListener('click', () => { $('#lightbox').hidden = true; }
   });
 
 // meta editor — title + description
-$('#metaSave').addEventListener('click', async () => {
+async function autoSaveDescription() {
   const it = state.items[state.cur];
   if (!it) return;
-  const newTitle = $('#metaTitleInput').value.trim() || 'Untitled';
-  const newDesc = $('#descInput').value;
-  $('#metaStatus').textContent = 'Saving…';
+  const ed = $('#descInput');
+  const isEmpty = !ed.textContent.trim();
+  const newPlain = isEmpty ? '' : ed.textContent.trim();
+  const newHtml = isEmpty ? '' : sanitizeHTML(ed.innerHTML);
+  if (newPlain === (it.description || '') && newHtml === (it.description_html || '')) return;
+
   try {
-    if (newTitle !== it.title) await saveTitle(it.id, newTitle);
-    if (newDesc !== it.description) await saveDescription(it.id, newDesc);
+    await saveDescription(it.id, newPlain, newHtml);
+    // update caption without re-rendering the whole viewer
+    const descEl = $('#captionDesc');
+    if (newHtml) { descEl.innerHTML = newHtml; descEl.style.whiteSpace = 'normal'; descEl.hidden = false; }
+    else if (newPlain) { descEl.textContent = newPlain; descEl.style.whiteSpace = 'pre-wrap'; descEl.hidden = false; }
+    else { descEl.textContent = ''; descEl.hidden = true; }
+    renderStrip(); renderThumbs();
     $('#metaStatus').textContent = '✓ Saved';
-    renderViewer(); renderStrip(); renderThumbs();
-    setTimeout(() => { $('#metaStatus').textContent = ''; }, 1500);
+    setTimeout(() => {
+      if ($('#metaStatus').textContent === '✓ Saved') $('#metaStatus').textContent = '';
+    }, 1500);
   } catch (e) {
     console.error(e);
     $('#metaStatus').textContent = 'Save failed';
   }
+}
+
+let descSaveTimer;
+$('#descInput').addEventListener('input', () => {
+  const ed = $('#descInput');
+  ed.classList.toggle('is-empty', !ed.textContent.trim());
+  clearTimeout(descSaveTimer);
+  descSaveTimer = setTimeout(autoSaveDescription, 1500);
 });
 
 $('#metaTitleInput').addEventListener('blur', async () => {
@@ -949,13 +1107,78 @@ $('#metaTitleInput').addEventListener('blur', async () => {
   catch (e) { console.error(e); }
 });
 
-$('#descInput').addEventListener('blur', async () => {
+$('#metaSave').addEventListener('click', async () => {
   const it = state.items[state.cur];
   if (!it) return;
-  const val = $('#descInput').value;
-  if (val === (it.description || '')) return;
-  try { await saveDescription(it.id, val); renderViewer(); renderThumbs(); }
-  catch (e) { console.error(e); }
+  const newTitle = $('#metaTitleInput').value.trim() || 'Untitled';
+  const ed = $('#descInput');
+  const isEmpty = !ed.textContent.trim();
+  const newPlain = isEmpty ? '' : ed.textContent.trim();
+  const newHtml = isEmpty ? '' : sanitizeHTML(ed.innerHTML);
+
+  $('#metaStatus').textContent = 'Saving…';
+  try {
+    if (newTitle !== it.title) await saveTitle(it.id, newTitle);
+    if (newPlain !== (it.description || '') || newHtml !== (it.description_html || '')) {
+      await saveDescription(it.id, newPlain, newHtml);
+    }
+    $('#metaStatus').textContent = '✓ Saved';
+    renderViewer(); renderStrip(); renderThumbs();
+    setTimeout(() => { $('#metaStatus').textContent = ''; }, 1500);
+  } catch (e) {
+    console.error(e);
+    $('#metaStatus').textContent = 'Save failed';
+  }
+});
+
+// toolbar wiring
+function richExec(cmd, arg) {
+  document.execCommand(cmd, false, arg || null);
+  $('#descInput').focus();
+  updateToolbarState();
+}
+
+document.querySelectorAll('#metaToolbar .rt-btn[data-cmd]').forEach(btn => {
+  btn.addEventListener('mousedown', (e) => e.preventDefault());
+  btn.addEventListener('click', () => richExec(btn.dataset.cmd));
+});
+
+$('#rtFormat').addEventListener('change', (e) => {
+  document.execCommand('formatBlock', false, '<' + e.target.value + '>');
+  $('#descInput').focus();
+});
+
+$('#rtLink').addEventListener('mousedown', (e) => e.preventDefault());
+$('#rtLink').addEventListener('click', () => {
+  const sel = window.getSelection();
+  if (!sel || sel.isCollapsed) { toast('Select some text first'); return; }
+  const url = prompt('Link URL:', 'https://');
+  if (!url) return;
+  if (!/^(https?:|mailto:|tel:|\/|#)/i.test(url)) {
+    toast('Only http(s), mailto, tel, or relative links');
+    return;
+  }
+  document.execCommand('createLink', false, url);
+  $('#descInput').querySelectorAll('a:not([target])').forEach(a => {
+    a.target = '_blank'; a.rel = 'noopener noreferrer';
+  });
+  $('#descInput').focus();
+  updateToolbarState();
+});
+
+function updateToolbarState() {
+  const cmds = ['bold','italic','underline','strikeThrough',
+                'insertUnorderedList','insertOrderedList'];
+  document.querySelectorAll('#metaToolbar .rt-btn[data-cmd]').forEach(btn => {
+    const cmd = btn.dataset.cmd;
+    if (!cmds.includes(cmd)) return;
+    try { btn.classList.toggle('active', document.queryCommandState(cmd)); }
+    catch {}
+  });
+}
+
+document.addEventListener('selectionchange', () => {
+  if (document.activeElement === $('#descInput')) updateToolbarState();
 });
 
   // comment form
